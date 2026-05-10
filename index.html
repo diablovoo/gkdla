@@ -63,15 +63,15 @@
             <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
             </span>
-            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1">...</span> 명</span>
+            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 명</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
-            <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">...</span> 회</span>
+            <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
-            <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">...</span> 회</span>
+            <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
         </div>
     </div>
 
@@ -219,14 +219,13 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, onSnapshot, runTransaction, increment } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         // 설정 로드
         const firebaseConfig = JSON.parse(__firebase_config);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // UI 요소
-        const activeChatsEl = document.getElementById('activeChats');
         const todayViewsEl = document.getElementById('todayViews');
         const totalViewsEl = document.getElementById('totalViews');
 
@@ -237,81 +236,91 @@
 
         async function initStats() {
             try {
-                // 1. 인증 처리
+                // 1. 인증 처리 (인증 완료까지 기다림)
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
 
-                // 인증 완료 대기
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) return;
 
                     const todayKey = new Date().toISOString().split('T')[0];
-                    const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'global_stats');
+                    const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_stats', 'global_views_v2');
 
-                    // 2. 조회수 업데이트 (트랜잭션)
-                    await runTransaction(db, async (transaction) => {
-                        const sfDoc = await transaction.get(statsDocRef);
-                        
-                        if (!sfDoc.exists()) {
-                            transaction.set(statsDocRef, { 
-                                total_views: 1, 
-                                today_views: 1, 
-                                last_date: todayKey 
-                            });
-                        } else {
-                            const data = sfDoc.data();
-                            let newTodayViews = data.today_views || 0;
-                            if (data.last_date !== todayKey) {
-                                newTodayViews = 1;
-                            } else {
-                                newTodayViews += 1;
-                            }
-                            transaction.update(statsDocRef, {
-                                total_views: increment(1),
-                                today_views: newTodayViews,
-                                last_date: todayKey
-                            });
-                        }
-                    });
-
-                    // 3. 실시간 리스너 연결
+                    // 2. 실시간 화면 업데이트 (먼저 리스너를 달아 진짜 서버 숫자를 즉시 렌더링)
                     onSnapshot(statsDocRef, (docSnap) => {
                         if (docSnap.exists()) {
                             const data = docSnap.data();
-                            todayViewsEl.textContent = (data.today_views || 0).toLocaleString();
-                            totalViewsEl.textContent = (data.total_views || 0).toLocaleString();
+                            todayViewsEl.innerHTML = (data.today_views || 0).toLocaleString();
+                            totalViewsEl.innerHTML = (data.total_views || 0).toLocaleString();
+                        } else {
+                            todayViewsEl.innerHTML = "0";
+                            totalViewsEl.innerHTML = "0";
                         }
                     }, (error) => {
                         console.error("Firestore sync error:", error);
-                        todayViewsEl.textContent = "0";
-                        totalViewsEl.textContent = "0";
                     });
+
+                    // 3. 1씩 증가 로직 (백그라운드에서 안전하게 증가, 화면 깜빡임 제거)
+                    if (!window.hasCountedView) {
+                        window.hasCountedView = true;
+                        
+                        try {
+                            const sfDoc = await getDoc(statsDocRef);
+                            if (!sfDoc.exists()) {
+                                await setDoc(statsDocRef, { 
+                                    total_views: 1, 
+                                    today_views: 1, 
+                                    last_date: todayKey 
+                                });
+                            } else {
+                                const data = sfDoc.data();
+                                if (data.last_date !== todayKey) {
+                                    await updateDoc(statsDocRef, {
+                                        total_views: increment(1),
+                                        today_views: 1,
+                                        last_date: todayKey
+                                    });
+                                } else {
+                                    await updateDoc(statsDocRef, {
+                                        total_views: increment(1),
+                                        today_views: increment(1)
+                                    });
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Write Error:", e);
+                        }
+                    }
                 });
 
             } catch (error) {
                 console.error("Auth/Stats error:", error);
-                todayViewsEl.textContent = "0";
-                totalViewsEl.textContent = "0";
             }
-        }
-
-        // 상담중 인원 로직 (자연스럽게 변동)
-        function updateActiveChats() {
-            const weightedPool = [3, 3, 3, 4, 4, 4, 4, 5, 5, 5];
-            const randomIdx = Math.floor(Math.random() * weightedPool.length);
-            activeChatsEl.textContent = weightedPool[randomIdx];
         }
 
         // 실행
         initStats();
-        setTimeout(updateActiveChats, 500);
-        setInterval(updateActiveChats, 8000 + Math.random() * 7000);
     </script>
 
     <script>
+        // 상담중 인원 로직 (1~6명 사이, 로드 시 즉시 1번 실행 후 천천히 변동)
+        function updateActiveChats() {
+            const activeChatsEl = document.getElementById('activeChats');
+            if(activeChatsEl) {
+                // 1부터 6까지의 무작위 숫자
+                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1;
+            }
+        }
+        
+        // 페이지 열리자마자 바로 1~6명 세팅 (0명이나 빈칸 방지)
+        updateActiveChats();
+        
+        // 10~15초 사이의 랜덤한 주기로 천천히 변경
+        setInterval(updateActiveChats, 10000 + Math.random() * 5000);
+
         function processOrder() {
             const textarea = document.getElementById('orderText');
             textarea.select();
