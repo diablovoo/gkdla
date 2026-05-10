@@ -215,119 +215,155 @@
         </div>
     </div>
 
-    <!-- Firebase 공용 조회수 카운터 v4 -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import {
-            getFirestore,
-            doc,
-            getDoc,
-            setDoc,
-            updateDoc,
-            increment,
-            onSnapshot
-        } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+    <!-- Firebase Firestore REST 공용 조회수 카운터 v5 -->
+    <script>
+        (function () {
+            const todayViewsEl = document.getElementById('todayViews');
+            const totalViewsEl = document.getElementById('totalViews');
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC_JQ4NaFn8LrrBY6qYyDnAKoS-ed9g_aA",
-            authDomain: "jinn-c154f.firebaseapp.com",
-            projectId: "jinn-c154f",
-            storageBucket: "jinn-c154f.firebasestorage.app",
-            messagingSenderId: "762418755729",
-            appId: "1:762418755729:web:7197d5e1d214d8f9462730",
-            measurementId: "G-KWQYYF5QFE"
-        };
+            const PROJECT_ID = 'jinn-c154f';
+            const COLLECTION = 'gameshop_public_stats';
+            const DOCUMENT = 'global_views_v1';
+            const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION}/${DOCUMENT}`;
 
-        const todayViewsEl = document.getElementById('todayViews');
-        const totalViewsEl = document.getElementById('totalViews');
+            function getKoreaDateKey() {
+                const parts = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: 'Asia/Seoul',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).formatToParts(new Date());
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const statsRef = doc(db, 'gameshop_public_stats', 'global_views_v1');
-
-        function getKoreaDateKey() {
-            const parts = new Intl.DateTimeFormat('en-CA', {
-                timeZone: 'Asia/Seoul',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            }).formatToParts(new Date());
-
-            const y = parts.find(p => p.type === 'year').value;
-            const m = parts.find(p => p.type === 'month').value;
-            const d = parts.find(p => p.type === 'day').value;
-            return `${y}-${m}-${d}`;
-        }
-
-        function renderStats(today, total) {
-            if (todayViewsEl) todayViewsEl.textContent = Number(today || 0).toLocaleString('ko-KR');
-            if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString('ko-KR');
-        }
-
-        function renderError() {
-            if (todayViewsEl) todayViewsEl.textContent = '0';
-            if (totalViewsEl) totalViewsEl.textContent = '0';
-        }
-
-        async function countView() {
-            const todayKey = getKoreaDateKey();
-
-            const snap = await getDoc(statsRef);
-
-            if (!snap.exists()) {
-                await setDoc(statsRef, {
-                    today_views: 1,
-                    total_views: 1,
-                    last_date: todayKey,
-                    updated_at: Date.now()
-                });
-                return;
+                const y = parts.find(p => p.type === 'year').value;
+                const m = parts.find(p => p.type === 'month').value;
+                const d = parts.find(p => p.type === 'day').value;
+                return `${y}-${m}-${d}`;
             }
 
-            const data = snap.data();
-            const isSameDay = data.last_date === todayKey;
-
-            if (isSameDay) {
-                await updateDoc(statsRef, {
-                    today_views: increment(1),
-                    total_views: increment(1),
-                    updated_at: Date.now()
-                });
-            } else {
-                await updateDoc(statsRef, {
-                    today_views: 1,
-                    total_views: increment(1),
-                    last_date: todayKey,
-                    updated_at: Date.now()
-                });
+            function getIntField(doc, name) {
+                const field = doc && doc.fields && doc.fields[name];
+                if (!field) return 0;
+                if (field.integerValue !== undefined) return Number(field.integerValue);
+                if (field.doubleValue !== undefined) return Number(field.doubleValue);
+                return 0;
             }
-        }
 
-        async function startCounter() {
-            renderStats(0, 0);
+            function getStringField(doc, name) {
+                const field = doc && doc.fields && doc.fields[name];
+                if (!field) return '';
+                return field.stringValue || '';
+            }
 
-            onSnapshot(statsRef, (snap) => {
-                if (!snap.exists()) {
-                    renderStats(0, 0);
+            function render(today, total) {
+                if (todayViewsEl) todayViewsEl.textContent = Number(today || 0).toLocaleString('ko-KR');
+                if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString('ko-KR');
+            }
+
+            function renderFail() {
+                if (todayViewsEl) todayViewsEl.textContent = 'DB확인';
+                if (totalViewsEl) totalViewsEl.textContent = 'DB확인';
+            }
+
+            async function readCounter() {
+                const res = await fetch(BASE_URL, { method: 'GET' });
+                if (res.status === 404) return null;
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`READ ${res.status}: ${text}`);
+                }
+                return await res.json();
+            }
+
+            async function createCounter(todayKey) {
+                const createUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION}?documentId=${DOCUMENT}`;
+                const body = {
+                    fields: {
+                        today_views: { integerValue: "1" },
+                        total_views: { integerValue: "1" },
+                        last_date: { stringValue: todayKey },
+                        updated_at: { integerValue: String(Date.now()) }
+                    }
+                };
+
+                const res = await fetch(createUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok && res.status !== 409) {
+                    const text = await res.text();
+                    throw new Error(`CREATE ${res.status}: ${text}`);
+                }
+            }
+
+            async function updateCounter(todayKey, todayViews, totalViews) {
+                const patchUrl =
+                    `${BASE_URL}?updateMask.fieldPaths=today_views&updateMask.fieldPaths=total_views&updateMask.fieldPaths=last_date&updateMask.fieldPaths=updated_at`;
+
+                const body = {
+                    fields: {
+                        today_views: { integerValue: String(todayViews) },
+                        total_views: { integerValue: String(totalViews) },
+                        last_date: { stringValue: todayKey },
+                        updated_at: { integerValue: String(Date.now()) }
+                    }
+                };
+
+                const res = await fetch(patchUrl, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`UPDATE ${res.status}: ${text}`);
+                }
+            }
+
+            async function countOnce() {
+                const todayKey = getKoreaDateKey();
+
+                let doc = await readCounter();
+
+                if (!doc) {
+                    await createCounter(todayKey);
+                    render(1, 1);
                     return;
                 }
 
-                const data = snap.data();
-                renderStats(data.today_views, data.total_views);
-            }, (error) => {
-                console.error('[GAMESHOP] Firestore 실시간 조회 실패:', error);
-                renderError();
+                const lastDate = getStringField(doc, 'last_date');
+                const oldToday = getIntField(doc, 'today_views');
+                const oldTotal = getIntField(doc, 'total_views');
+
+                const nextToday = lastDate === todayKey ? oldToday + 1 : 1;
+                const nextTotal = oldTotal + 1;
+
+                await updateCounter(todayKey, nextToday, nextTotal);
+                render(nextToday, nextTotal);
+            }
+
+            async function refreshOnly() {
+                try {
+                    const doc = await readCounter();
+                    if (!doc) {
+                        render(0, 0);
+                        return;
+                    }
+                    render(getIntField(doc, 'today_views'), getIntField(doc, 'total_views'));
+                } catch (e) {
+                    console.error('[GAMESHOP] 조회수 읽기 실패:', e);
+                }
+            }
+
+            countOnce().catch((e) => {
+                console.error('[GAMESHOP] 조회수 증가 실패:', e);
+                renderFail();
             });
 
-            try {
-                await countView();
-            } catch (error) {
-                console.error('[GAMESHOP] 조회수 증가 실패:', error);
-                renderError();
-            }
-        }
-
-        startCounter();
+            setInterval(refreshOnly, 5000);
+        })();
     </script>
 
     <script>
