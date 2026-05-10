@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAMESHOP (채널톡 연동)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { 
+            font-family: 'Pretendard', sans-serif; 
+            background-color: #f8fafc; 
+            color: #0f172a; 
+        }
+        
+        /* 스크롤바 디자인 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* 전광판 (왼쪽에서 오른쪽으로 흐르는 애니메이션) */
+        @keyframes marquee-ltr {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(0%); }
+        }
+        .animate-marquee-ltr {
+            display: inline-block;
+            white-space: nowrap;
+            animation: marquee-ltr 30s linear infinite;
+        }
+
+        /* 배경 애니메이션 */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob { animation: blob 7s infinite; }
+        .animation-delay-2000 { animation-delay: 2s; }
+    </style>
+
+    <!-- 👇 사장님께서 발급받으신 채널톡 진짜 스크립트 👇 -->
+    <script>
+        (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
+
+        ChannelIO('boot', {
+            "pluginKey": "bc2809e8-2542-4534-bd25-94d9dc9c20fd"
+        });
+    </script>
+    <!-- 👆 채널톡 스크립트 끝 👆 -->
+
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 relative overflow-hidden">
+
+    <!-- 장식용 배경 효과 -->
+    <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 pointer-events-none"></div>
+
+    <!-- 메인 주문 카드 (폭을 약간 넓혀 단가표가 잘 보이게 조정) -->
+    <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-lg shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)]">
+        
+        <!-- 헤더 영역 -->
+        <div class="flex flex-col items-center mb-6">
+            <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
+                <i class="ph-fill ph-game-controller text-4xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-black tracking-tight text-slate-800">GAMESHOP</h1>
+            <p class="text-sm text-slate-500 mt-1 font-medium">가장 빠르고 안전한 거래 전문 상점</p>
+        </div>
+
+        <!-- 취급 품목 전광판 (왼쪽에서 오른쪽으로 흐름) -->
+        <div class="overflow-hidden bg-blue-50 py-3 rounded-2xl border border-blue-100 shadow-inner mb-6 relative">
+            <div class="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-blue-50 to-transparent z-10"></div>
+            <div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-blue-50 to-transparent z-10"></div>
+            <!-- 동일한 텍스트를 반복하여 끊김없이 흐르게 만듦 -->
+            <div class="animate-marquee-ltr font-bold text-blue-600 text-[15px] tracking-wide">
+                <span>
+                    &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 잊힌영혼 ✦ 골드 ✦ 상급열쇠 ✦ 하급열쇠 ✦ 벨리알 껍데기 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 룬셋 ✦ 육성/버스
+                    &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 잊힌영혼 ✦ 골드 ✦ 상급열쇠 ✦ 하급열쇠 ✦ 벨리알 껍데기 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 룬셋 ✦ 육성/버스
+                </span>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            
+            <!-- 단가표 영역 -->
+            <div class="bg-white/60 border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><i class="ph-fill ph-list-dashes text-blue-500 text-lg"></i> 상품 단가 안내</h3>
+                
+                <!-- 스크롤 가능한 가격 리스트 -->
+                <div class="h-44 overflow-y-auto text-[13px] text-slate-600 space-y-4 pr-3 font-medium custom-scrollbar">
+                    
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">신화꾸러기 <span class="text-[11px] font-normal text-slate-400 ml-1">(10분이내 출발 스피드 / 신화랜덤1개+벼락불1개)</span></p>
+                        <p class="mt-1">1회 6,000원 / 5회 21,000원 / 10회 38,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">보물의틈새 <span class="text-[11px] font-normal text-slate-400 ml-1">(옵두사이트,니스아이언,분광경 획득)</span></p>
+                        <p class="mt-1">1회 3,000원 / 5회 12,000원 / 10회 19,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">잊힌영혼 <span class="text-[11px] font-normal text-blue-500 ml-1">(바닥거래)</span></p>
+                        <p class="mt-1">1,000개 12,000원 / 3,000개 33,000원 / 5,000개 60,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">골드 <span class="text-[11px] font-normal text-slate-400 ml-1">(999억 맥스)</span></p>
+                        <p class="mt-1">100억 5,000원 / 200억 9,000원 / 300억 13,000원<br>500억 20,000원 / 900억 34,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">상급열쇠 소굴</p>
+                        <p class="mt-1">100개 6,000원 / 200개 10,000원 / 500개 17,000원 / 1000개 30,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">하급열쇠 소굴</p>
+                        <p class="mt-1">100개 6,000원 / 200개 10,000원 / 500개 17,000원 / 1000개 30,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">벨리알 껍데기</p>
+                        <p class="mt-1">50개 6,000원 / 100개 10,000원 / 200개 19,000원<br>300개 26,000원 / 500개 38,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">웅장한 보석 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
+                        <p class="mt-1">1개 2,000원 / 5개 5,000원 / 10개 8,000원<br>20개 15,000원 / 50개 28,000원 / 100개 45,000원<br><span class="text-blue-500 text-[11px]">※ 5개부터 섞어서 가능</span></p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">온전한 호라드림 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
+                        <p class="mt-1">1개 10,000원 / 5개 40,000원 / 10개 70,000원</p>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-3">
+                        <p class="font-bold text-slate-800 text-[14px]">룬셋 <span class="text-[11px] font-normal text-slate-400 ml-1">(영벌,수의,별반,샤코,한아비,셀리그,티리엘)</span></p>
+                        <p class="mt-1">1셋 8,000원 / 3셋 20,000원 / 5셋 30,000원</p>
+                    </div>
+
+                    <div>
+                        <p class="font-bold text-slate-800 text-[14px]">육성 및 버스</p>
+                        <p class="mt-1">1-70레벨 6,000원 / 정복자1-100레벨 25,000원<br>만랩+정복자1-100 30,000원 / 시즌13 메인퀘 클리어 30,000원<br>나락100단 1시간 10,000원 / 고행8 릴리트1회 5,000원 / 고행10 메피스토 1회 10,000원</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- 주문서 양식 -->
+            <div>
+                <label class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
+                    <i class="ph-fill ph-clipboard-text text-slate-400 text-lg"></i> 복사될 주문서 양식 <span class="text-xs font-normal text-blue-500 ml-auto">내용을 직접 수정하실 수 있습니다</span>
+                </label>
+                <div class="relative group">
+                    <!-- 고객이 복사 전 내용을 수정할 수 있도록 입력 가능하게 처리 -->
+                    <textarea id="orderText" class="w-full h-[150px] bg-slate-50 text-[13px] text-slate-700 p-4 rounded-2xl border border-slate-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 transition-all resize-none outline-none font-mono leading-relaxed group-hover:bg-white shadow-inner custom-scrollbar">
+물품정보: 
+수량: 
+
+[구매자 정보]
+배틀태그: 
+입금자명: </textarea>
+                </div>
+            </div>
+
+            <!-- 구매 버튼 -->
+            <button onclick="processOrder()" class="w-full relative overflow-hidden group bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2">
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="ph-fill ph-chat-circle-dots text-xl relative z-10"></i> 
+                <span class="relative z-10 text-[15px]">주문서 복사하고 상담 시작하기</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        function processOrder() {
+            // 1. 텍스트 영역 선택 후 복사
+            const textarea = document.getElementById('orderText');
+            textarea.select();
+            document.execCommand('copy');
+            
+            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!\n우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
+
+            // 2. 채널톡 강제 오픈
+            if (typeof ChannelIO !== 'undefined') {
+                ChannelIO('showMessenger');
+            } else {
+                alert('채널톡 플러그인을 불러오는 중입니다. 잠시 후 우측 하단 버튼을 눌러주세요.');
+            }
+        }
+    </script>
+</body>
+</html>
