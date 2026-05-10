@@ -215,23 +215,18 @@
         </div>
     </div>
 
-    <!-- Firebase 공용 조회수 설정
-         1) Firestore Database 생성
-         2) Firestore Rules에 아래 규칙 붙여넣고 게시
-
-         rules_version = '2';
-         service cloud.firestore {
-           match /databases/{database}/documents {
-             match /gameshop_public_stats/{docId} {
-               allow read, create, update: if true;
-               allow delete: if false;
-             }
-           }
-         }
-    -->
+    <!-- Firebase 공용 조회수 카운터 v4 -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getFirestore, doc, onSnapshot, runTransaction } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc,
+            increment,
+            onSnapshot
+        } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         const firebaseConfig = {
             apiKey: "AIzaSyC_JQ4NaFn8LrrBY6qYyDnAKoS-ed9g_aA",
@@ -246,83 +241,105 @@
         const todayViewsEl = document.getElementById('todayViews');
         const totalViewsEl = document.getElementById('totalViews');
 
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const statsRef = doc(db, 'gameshop_public_stats', 'global_views_v1');
+
+        function getKoreaDateKey() {
+            const parts = new Intl.DateTimeFormat('en-CA', {
+                timeZone: 'Asia/Seoul',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            }).formatToParts(new Date());
+
+            const y = parts.find(p => p.type === 'year').value;
+            const m = parts.find(p => p.type === 'month').value;
+            const d = parts.find(p => p.type === 'day').value;
+            return `${y}-${m}-${d}`;
+        }
+
         function renderStats(today, total) {
-            if (todayViewsEl) todayViewsEl.textContent = Number(today || 0).toLocaleString();
-            if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString();
+            if (todayViewsEl) todayViewsEl.textContent = Number(today || 0).toLocaleString('ko-KR');
+            if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString('ko-KR');
         }
 
-        function keepCleanOnError(error) {
-            console.error('Firebase 공용 조회수 오류:', error);
-            // 사용자가 보는 디자인은 깨지지 않게 숫자 0 유지
-            renderStats(0, 0);
+        function renderError() {
+            if (todayViewsEl) todayViewsEl.textContent = '0';
+            if (totalViewsEl) totalViewsEl.textContent = '0';
         }
 
-        async function initGlobalViews() {
-            renderStats(0, 0);
+        async function countView() {
+            const todayKey = getKoreaDateKey();
 
-            try {
-                const app = initializeApp(firebaseConfig);
-                const db = getFirestore(app);
-                const statsDocRef = doc(db, 'gameshop_public_stats', 'global_views_v1');
+            const snap = await getDoc(statsRef);
 
-                onSnapshot(statsDocRef, (snapshot) => {
-                    if (!snapshot.exists()) {
-                        renderStats(0, 0);
-                        return;
-                    }
-                    const data = snapshot.data();
-                    renderStats(data.today_views || 0, data.total_views || 0);
-                }, keepCleanOnError);
-
-                if (window.__gameshopCountedView) return;
-                window.__gameshopCountedView = true;
-
-                const todayKey = new Date().toISOString().slice(0, 10);
-
-                await runTransaction(db, async (transaction) => {
-                    const snapshot = await transaction.get(statsDocRef);
-
-                    if (!snapshot.exists()) {
-                        transaction.set(statsDocRef, {
-                            today_views: 1,
-                            total_views: 1,
-                            last_date: todayKey,
-                            updated_at: Date.now()
-                        });
-                        return;
-                    }
-
-                    const data = snapshot.data();
-                    const totalViews = Number(data.total_views || 0) + 1;
-                    const todayViews = data.last_date === todayKey
-                        ? Number(data.today_views || 0) + 1
-                        : 1;
-
-                    transaction.update(statsDocRef, {
-                        today_views: todayViews,
-                        total_views: totalViews,
-                        last_date: todayKey,
-                        updated_at: Date.now()
-                    });
+            if (!snap.exists()) {
+                await setDoc(statsRef, {
+                    today_views: 1,
+                    total_views: 1,
+                    last_date: todayKey,
+                    updated_at: Date.now()
                 });
-            } catch (error) {
-                keepCleanOnError(error);
+                return;
+            }
+
+            const data = snap.data();
+            const isSameDay = data.last_date === todayKey;
+
+            if (isSameDay) {
+                await updateDoc(statsRef, {
+                    today_views: increment(1),
+                    total_views: increment(1),
+                    updated_at: Date.now()
+                });
+            } else {
+                await updateDoc(statsRef, {
+                    today_views: 1,
+                    total_views: increment(1),
+                    last_date: todayKey,
+                    updated_at: Date.now()
+                });
             }
         }
 
-        initGlobalViews();
+        async function startCounter() {
+            renderStats(0, 0);
+
+            onSnapshot(statsRef, (snap) => {
+                if (!snap.exists()) {
+                    renderStats(0, 0);
+                    return;
+                }
+
+                const data = snap.data();
+                renderStats(data.today_views, data.total_views);
+            }, (error) => {
+                console.error('[GAMESHOP] Firestore 실시간 조회 실패:', error);
+                renderError();
+            });
+
+            try {
+                await countView();
+            } catch (error) {
+                console.error('[GAMESHOP] 조회수 증가 실패:', error);
+                renderError();
+            }
+        }
+
+        startCounter();
     </script>
 
     <script>
-        // 상담중 인원 로직 - 1~7명 사이에서 천천히 왔다갔다
+        // 상담중 인원 로직 - 1~7명 사이에서 천천히 변경
         let currentActiveChats = Math.floor(Math.random() * 7) + 1;
 
         function updateActiveChats() {
             const activeChatsEl = document.getElementById('activeChats');
             if (!activeChatsEl) return;
 
-            const direction = Math.random() > 0.5 ? 1 : -1;
-            currentActiveChats += direction;
+            const move = Math.random() > 0.5 ? 1 : -1;
+            currentActiveChats += move;
 
             if (currentActiveChats < 1) currentActiveChats = 2;
             if (currentActiveChats > 7) currentActiveChats = 6;
