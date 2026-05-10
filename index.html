@@ -215,111 +215,73 @@
         </div>
     </div>
 
-    <!-- Firebase SDK v11 (Modular) -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
-
-        // 설정 로드
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-
-        // UI 요소
-        const todayViewsEl = document.getElementById('todayViews');
-        const totalViewsEl = document.getElementById('totalViews');
-
-        // 초기화
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        async function initStats() {
-            try {
-                // 1. 인증 처리 (인증 완료까지 기다림)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                onAuthStateChanged(auth, async (user) => {
-                    if (!user) return;
-
-                    const todayKey = new Date().toISOString().split('T')[0];
-                    const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_stats', 'global_views_v2');
-
-                    // 2. 실시간 화면 업데이트 (먼저 리스너를 달아 진짜 서버 숫자를 즉시 렌더링)
-                    onSnapshot(statsDocRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            todayViewsEl.innerHTML = (data.today_views || 0).toLocaleString();
-                            totalViewsEl.innerHTML = (data.total_views || 0).toLocaleString();
-                        } else {
-                            todayViewsEl.innerHTML = "0";
-                            totalViewsEl.innerHTML = "0";
-                        }
-                    }, (error) => {
-                        console.error("Firestore sync error:", error);
-                    });
-
-                    // 3. 1씩 증가 로직 (백그라운드에서 안전하게 증가, 화면 깜빡임 제거)
-                    if (!window.hasCountedView) {
-                        window.hasCountedView = true;
-                        
-                        try {
-                            const sfDoc = await getDoc(statsDocRef);
-                            if (!sfDoc.exists()) {
-                                await setDoc(statsDocRef, { 
-                                    total_views: 1, 
-                                    today_views: 1, 
-                                    last_date: todayKey 
-                                });
-                            } else {
-                                const data = sfDoc.data();
-                                if (data.last_date !== todayKey) {
-                                    await updateDoc(statsDocRef, {
-                                        total_views: increment(1),
-                                        today_views: 1,
-                                        last_date: todayKey
-                                    });
-                                } else {
-                                    await updateDoc(statsDocRef, {
-                                        total_views: increment(1),
-                                        today_views: increment(1)
-                                    });
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Write Error:", e);
-                        }
-                    }
-                });
-
-            } catch (error) {
-                console.error("Auth/Stats error:", error);
-            }
-        }
-
-        // 실행
-        initStats();
-    </script>
-
     <script>
-        // 상담중 인원 로직 (1~6명 사이, 로드 시 즉시 1번 실행 후 천천히 변동)
-        function updateActiveChats() {
-            const activeChatsEl = document.getElementById('activeChats');
-            if(activeChatsEl) {
-                // 1부터 6까지의 무작위 숫자
-                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1;
+        // 조회수 로직 - 디자인 변경 없음 / 브라우저 저장(localStorage) 방식
+        (function () {
+            const todayViewsEl = document.getElementById('todayViews');
+            const totalViewsEl = document.getElementById('totalViews');
+
+            if (!todayViewsEl || !totalViewsEl) return;
+
+            function getLocalDateKey() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
             }
-        }
-        
-        // 페이지 열리자마자 바로 1~6명 세팅 (0명이나 빈칸 방지)
-        updateActiveChats();
-        
-        // 10~15초 사이의 랜덤한 주기로 천천히 변경
-        setInterval(updateActiveChats, 10000 + Math.random() * 5000);
+
+            const todayKey = getLocalDateKey();
+            const savedDate = localStorage.getItem('gameshop_view_date');
+            let todayViews = Number(localStorage.getItem('gameshop_today_views') || 0);
+            let totalViews = Number(localStorage.getItem('gameshop_total_views') || 0);
+
+            // 날짜가 바뀌면 오늘 조회수만 0부터 다시 시작
+            if (savedDate !== todayKey) {
+                todayViews = 0;
+                localStorage.setItem('gameshop_view_date', todayKey);
+            }
+
+            // 페이지를 새로고침/방문할 때마다 1씩 증가
+            todayViews += 1;
+            totalViews += 1;
+
+            localStorage.setItem('gameshop_today_views', String(todayViews));
+            localStorage.setItem('gameshop_total_views', String(totalViews));
+
+            todayViewsEl.textContent = todayViews.toLocaleString('ko-KR');
+            totalViewsEl.textContent = totalViews.toLocaleString('ko-KR');
+        })();
+
+        // 상담중 인원 로직 - 1~7명 사이에서 천천히 변경
+        (function () {
+            const activeChatsEl = document.getElementById('activeChats');
+            if (!activeChatsEl) return;
+
+            let current = Math.floor(Math.random() * 7) + 1;
+            activeChatsEl.textContent = current;
+
+            function updateActiveChats() {
+                const move = Math.random() > 0.5 ? 1 : -1;
+                let next = current + move;
+
+                if (next < 1) next = 2;
+                if (next > 7) next = 6;
+
+                current = next;
+                activeChatsEl.textContent = current;
+            }
+
+            function scheduleActiveChatUpdate() {
+                const delay = 10000 + Math.random() * 5000; // 10~15초
+                setTimeout(() => {
+                    updateActiveChats();
+                    scheduleActiveChatUpdate();
+                }, delay);
+            }
+
+            scheduleActiveChatUpdate();
+        })();
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
