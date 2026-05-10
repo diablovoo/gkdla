@@ -63,15 +63,15 @@
             <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
             </span>
-            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1">7</span> 명</span>
+            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1">0</span> 명</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
-            <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">54</span> 회</span>
+            <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">0</span> 회</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
-            <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">1,113</span> 회</span>
+            <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1">0</span> 회</span>
         </div>
     </div>
 
@@ -157,7 +157,7 @@
             </div>
         </div>
 
-        <!-- 우측: 실시간 구매 후기 (테두리 디자인 통일) -->
+        <!-- 우측: 실시간 구매 후기 -->
         <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-lg mx-auto lg:max-w-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] flex flex-col">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-star text-yellow-400 text-2xl"></i> 구매 후기</h2>
@@ -168,7 +168,6 @@
 
             <div class="flex-1 overflow-y-auto custom-scrollbar pr-3 space-y-3 max-h-[650px]">
                 
-                <!-- 수정된 첫 번째 리뷰 (강조 테두리 제거) -->
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -185,7 +184,6 @@
                     </p>
                 </div>
 
-                <!-- 리뷰 2 -->
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -200,7 +198,6 @@
                     <p class="text-[13px] text-slate-600 font-medium leading-relaxed">온전한 호라드림 보석 종류별로 대량 주문했는데 5분도 안돼서 배달 오네요 ㅋㅋ 역시 속도는 개빠릅니다.</p>
                 </div>
 
-                <!-- 리뷰 3 -->
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -215,7 +212,6 @@
                     <p class="text-[13px] text-slate-600 font-medium leading-relaxed">하드코어라 템 구하기 진짜 빡셌는데 골드와 보석, 극피 세팅까지 완벽하게 맞춰주셨습니다. 덕분에 고행 나락 등반 편하게 하네요.</p>
                 </div>
 
-                <!-- 리뷰 4 (결혼 관련) -->
                 <div class="bg-pink-50/50 border border-pink-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
@@ -242,30 +238,98 @@
         </div>
     </div>
 
+    <!-- Firebase SDK 로드 -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        // --------------------------------------------------------
+        // Firebase 및 실시간 통계 로직 (0부터 실제 카운팅)
+        // --------------------------------------------------------
+        (async function initStats() {
+            const firebaseConfig = JSON.parse(__firebase_config);
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            
+            const app = firebase.initializeApp(firebaseConfig);
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
             const activeChatsEl = document.getElementById('activeChats');
             const todayViewsEl = document.getElementById('todayViews');
             const totalViewsEl = document.getElementById('totalViews');
-            let todayViews = 54;
-            let totalViews = 1113;
 
-            function updateActiveChats() {
-                activeChatsEl.textContent = Math.floor(Math.random() * 10) + 1;
-            }
-            updateActiveChats();
-            setInterval(updateActiveChats, 6000 + Math.random() * 3000);
-
-            function updateViews() {
-                if (Math.random() > 0.6) {
-                    todayViews += 1;
-                    totalViews += 1;
-                    todayViewsEl.textContent = todayViews.toLocaleString();
-                    totalViewsEl.textContent = totalViews.toLocaleString();
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await auth.signInWithCustomToken(__initial_auth_token);
+                } else {
+                    await auth.signInAnonymously();
                 }
+
+                const todayKey = new Date().toISOString().split('T')[0];
+                const statsDocRef = db.doc(`artifacts/${appId}/public/data/global_stats`);
+
+                // 트랜잭션으로 정확하게 1씩 증가시키고 0부터 시작하도록 세팅
+                await db.runTransaction(async (transaction) => {
+                    const sfDoc = await transaction.get(statsDocRef);
+                    if (!sfDoc.exists) {
+                        transaction.set(statsDocRef, { 
+                            total_views: 1, 
+                            today_views: 1, 
+                            last_date: todayKey 
+                        });
+                        return;
+                    }
+
+                    const data = sfDoc.data();
+                    let newTodayViews = data.today_views || 0;
+                    
+                    if (data.last_date !== todayKey) {
+                        newTodayViews = 1;
+                    } else {
+                        newTodayViews += 1;
+                    }
+
+                    transaction.update(statsDocRef, {
+                        total_views: firebase.firestore.FieldValue.increment(1),
+                        today_views: newTodayViews,
+                        last_date: todayKey
+                    });
+                });
+
+                // 실시간 리스너 (DB 값이 바뀌면 화면도 즉시 바뀜)
+                statsDocRef.onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        todayViewsEl.textContent = (data.today_views || 0).toLocaleString();
+                        totalViewsEl.textContent = (data.total_views || 0).toLocaleString();
+                    }
+                }, (err) => {
+                    todayViewsEl.textContent = "0";
+                    totalViewsEl.textContent = "0";
+                });
+
+            } catch (error) {
+                todayViewsEl.textContent = "0";
+                totalViewsEl.textContent = "0";
             }
-            setInterval(updateViews, 4000);
-        });
+
+            // 💡 [수정] 현재 상담중: 3~5명 사이를 주로 유지하도록 가중치 랜덤 적용
+            function updateActiveChats() {
+                // 3, 3, 4, 4, 4, 5, 5 를 기본 풀로 설정 (주로 3~5 사이 유지)
+                // 가끔 2나 6이 나올 수 있게 섞음
+                const weightedPool = [2, 3, 3, 4, 4, 4, 5, 5, 6];
+                const randomIdx = Math.floor(Math.random() * weightedPool.length);
+                const count = weightedPool[randomIdx];
+                
+                activeChatsEl.textContent = count;
+            }
+            
+            setTimeout(updateActiveChats, 500); // 로드 직후 첫 설정
+            // 7초에서 15초 사이의 랜덤한 주기로 아주 가끔씩만 변경하여 안정감 부여
+            setInterval(updateActiveChats, 7000 + Math.random() * 8000);
+
+        })();
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
