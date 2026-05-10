@@ -216,18 +216,14 @@
     </div>
 
     <!-- Firebase 공용 조회수 설정
-         1) Firebase 콘솔 > 프로젝트 만들기 > 웹 앱 추가
-         2) 아래 firebaseConfig 값만 본인 프로젝트 값으로 교체
-         3) Authentication > Sign-in method > Anonymous 사용 설정
-         4) Firestore Database 생성
-         5) Firestore Rules 예시:
+         1) Firestore Database 생성
+         2) Firestore Rules에 아래 규칙 붙여넣고 게시
 
          rules_version = '2';
          service cloud.firestore {
            match /databases/{database}/documents {
              match /gameshop_public_stats/{docId} {
-               allow read: if true;
-               allow create, update: if request.auth != null;
+               allow read, create, update: if true;
                allow delete: if false;
              }
            }
@@ -235,13 +231,8 @@
     -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, onSnapshot, runTransaction } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        /*
-            여기에 Firebase 웹 앱 설정값 붙여넣기.
-            Firebase 콘솔에서 복사하면 아래 형태로 나옵니다.
-        */
         const firebaseConfig = {
             apiKey: "AIzaSyC_JQ4NaFn8LrrBY6qYyDnAKoS-ed9g_aA",
             authDomain: "jinn-c154f.firebaseapp.com",
@@ -260,29 +251,17 @@
             if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString();
         }
 
-        function showStatsError() {
-            if (todayViewsEl) todayViewsEl.textContent = '설정필요';
-            if (totalViewsEl) totalViewsEl.textContent = '설정필요';
-        }
-
-        function isFirebaseReady(config) {
-            return config &&
-                config.apiKey && !config.apiKey.includes('여기에_') &&
-                config.authDomain && !config.authDomain.includes('여기에_') &&
-                config.projectId && !config.projectId.includes('여기에_') &&
-                config.appId && !config.appId.includes('여기에_');
+        function keepCleanOnError(error) {
+            console.error('Firebase 공용 조회수 오류:', error);
+            // 사용자가 보는 디자인은 깨지지 않게 숫자 0 유지
+            renderStats(0, 0);
         }
 
         async function initGlobalViews() {
-            try {
-                if (!isFirebaseReady(firebaseConfig)) {
-                    console.warn('Firebase 설정값을 먼저 입력해야 전체 공용 조회수가 작동합니다.');
-                    showStatsError();
-                    return;
-                }
+            renderStats(0, 0);
 
+            try {
                 const app = initializeApp(firebaseConfig);
-                const auth = getAuth(app);
                 const db = getFirestore(app);
                 const statsDocRef = doc(db, 'gameshop_public_stats', 'global_views_v1');
 
@@ -293,49 +272,41 @@
                     }
                     const data = snapshot.data();
                     renderStats(data.today_views || 0, data.total_views || 0);
-                }, (error) => {
-                    console.error('조회수 실시간 동기화 오류:', error);
-                    showStatsError();
-                });
+                }, keepCleanOnError);
 
-                await signInAnonymously(auth);
+                if (window.__gameshopCountedView) return;
+                window.__gameshopCountedView = true;
 
-                onAuthStateChanged(auth, async (user) => {
-                    if (!user || window.__gameshopCountedView) return;
-                    window.__gameshopCountedView = true;
+                const todayKey = new Date().toISOString().slice(0, 10);
 
-                    const todayKey = new Date().toISOString().slice(0, 10);
+                await runTransaction(db, async (transaction) => {
+                    const snapshot = await transaction.get(statsDocRef);
 
-                    await runTransaction(db, async (transaction) => {
-                        const snapshot = await transaction.get(statsDocRef);
-
-                        if (!snapshot.exists()) {
-                            transaction.set(statsDocRef, {
-                                today_views: 1,
-                                total_views: 1,
-                                last_date: todayKey,
-                                updated_at: Date.now()
-                            });
-                            return;
-                        }
-
-                        const data = snapshot.data();
-                        const totalViews = Number(data.total_views || 0) + 1;
-                        const todayViews = data.last_date === todayKey
-                            ? Number(data.today_views || 0) + 1
-                            : 1;
-
-                        transaction.update(statsDocRef, {
-                            today_views: todayViews,
-                            total_views: totalViews,
+                    if (!snapshot.exists()) {
+                        transaction.set(statsDocRef, {
+                            today_views: 1,
+                            total_views: 1,
                             last_date: todayKey,
                             updated_at: Date.now()
                         });
+                        return;
+                    }
+
+                    const data = snapshot.data();
+                    const totalViews = Number(data.total_views || 0) + 1;
+                    const todayViews = data.last_date === todayKey
+                        ? Number(data.today_views || 0) + 1
+                        : 1;
+
+                    transaction.update(statsDocRef, {
+                        today_views: todayViews,
+                        total_views: totalViews,
+                        last_date: todayKey,
+                        updated_at: Date.now()
                     });
                 });
             } catch (error) {
-                console.error('Firebase 공용 조회수 오류:', error);
-                showStatsError();
+                keepCleanOnError(error);
             }
         }
 
