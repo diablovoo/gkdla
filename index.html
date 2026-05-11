@@ -434,41 +434,13 @@
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
-
-            if (!textarea) {
-                alert('주문서 입력칸을 찾지 못했습니다.');
-                return;
-            }
-
-            textarea.focus();
             textarea.select();
-            textarea.setSelectionRange(0, textarea.value.length);
-
-            let copied = false;
-
-            try {
-                copied = document.execCommand('copy');
-            } catch (e) {
-                copied = false;
-            }
-
-            if (copied) {
-                alert('✨ 주문서 양식이 복사되었습니다.
-채팅창에 붙여넣기(Ctrl+V) 후 정보를 입력해주세요.');
-
-                if (typeof ChannelIO !== 'undefined') {
-                    ChannelIO('showMessenger');
-                }
+            document.execCommand('copy');
+            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!
+우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
+            if (typeof ChannelIO !== 'undefined') {
+                ChannelIO('showMessenger');
             } else {
-                alert('복사가 자동으로 막혔습니다.
-지금 주문서가 선택된 상태입니다.
-Ctrl+C를 누른 뒤 채팅창에 Ctrl+V로 붙여넣어주세요.');
-
-                if (typeof ChannelIO !== 'undefined') {
-                    ChannelIO('showMessenger');
-                }
-            }
-        } else {
                 alert('채널톡 플러그인을 불러오는 중입니다. 잠시 후 우측 하단 버튼을 눌러주세요.');
             }
         }
