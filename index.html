@@ -63,7 +63,7 @@
             <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
             </span>
-            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 명</span>
+            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center">3</span> 명</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
@@ -367,39 +367,77 @@
     </script>
 
     <script>
-        // 상담중 인원 로직 - 1~7명 사이에서 천천히 변경
-        let currentActiveChats = Math.floor(Math.random() * 7) + 1;
+        // 상담중 인원 로직 - 새로고침해도 바로 안 바뀌고, 정해진 시간 간격으로만 변경
+        (function () {
+            const ACTIVE_CHAT_KEY = 'gameshop_active_chats_value';
+            const ACTIVE_CHAT_NEXT_KEY = 'gameshop_active_chats_next_update';
+            const ACTIVE_CHAT_MIN_DELAY = 10000; // 10초
+            const ACTIVE_CHAT_MAX_DELAY = 15000; // 15초
 
-        function updateActiveChats() {
-            const activeChatsEl = document.getElementById('activeChats');
-            if (!activeChatsEl) return;
+            function safeStorageGet(key) {
+                try { return localStorage.getItem(key); } catch (e) { return null; }
+            }
 
-            const move = Math.random() > 0.5 ? 1 : -1;
-            currentActiveChats += move;
+            function safeStorageSet(key, value) {
+                try { localStorage.setItem(key, value); } catch (e) {}
+            }
 
-            if (currentActiveChats < 1) currentActiveChats = 2;
-            if (currentActiveChats > 7) currentActiveChats = 6;
+            function getRandomActiveChatDelay() {
+                return ACTIVE_CHAT_MIN_DELAY + Math.floor(Math.random() * (ACTIVE_CHAT_MAX_DELAY - ACTIVE_CHAT_MIN_DELAY + 1));
+            }
 
-            activeChatsEl.textContent = currentActiveChats;
-        }
+            function getInitialActiveChats() {
+                const saved = Number(safeStorageGet(ACTIVE_CHAT_KEY));
+                if (saved >= 1 && saved <= 7) return saved;
 
-        function scheduleActiveChats() {
-            const delay = 10000 + Math.random() * 5000;
-            setTimeout(() => {
-                updateActiveChats();
-                scheduleActiveChats();
-            }, delay);
-        }
+                const firstValue = Math.floor(Math.random() * 7) + 1;
+                safeStorageSet(ACTIVE_CHAT_KEY, String(firstValue));
+                safeStorageSet(ACTIVE_CHAT_NEXT_KEY, String(Date.now() + getRandomActiveChatDelay()));
+                return firstValue;
+            }
 
-        const activeChatsEl = document.getElementById('activeChats');
-        if (activeChatsEl) activeChatsEl.textContent = currentActiveChats;
-        scheduleActiveChats();
+            function renderActiveChats(value) {
+                const activeChatsEl = document.getElementById('activeChats');
+                if (activeChatsEl) activeChatsEl.textContent = value;
+            }
+
+            function makeNextActiveChats(current) {
+                const move = Math.random() > 0.5 ? 1 : -1;
+                let next = Number(current || 1) + move;
+
+                if (next < 1) next = 2;
+                if (next > 7) next = 6;
+
+                return next;
+            }
+
+            function updateActiveChatsIfNeeded() {
+                const now = Date.now();
+                let current = getInitialActiveChats();
+                let nextUpdateAt = Number(safeStorageGet(ACTIVE_CHAT_NEXT_KEY) || 0);
+
+                if (!nextUpdateAt || now >= nextUpdateAt) {
+                    current = makeNextActiveChats(current);
+                    safeStorageSet(ACTIVE_CHAT_KEY, String(current));
+                    nextUpdateAt = now + getRandomActiveChatDelay();
+                    safeStorageSet(ACTIVE_CHAT_NEXT_KEY, String(nextUpdateAt));
+                }
+
+                renderActiveChats(current);
+
+                const wait = Math.max(1000, nextUpdateAt - Date.now());
+                setTimeout(updateActiveChatsIfNeeded, wait);
+            }
+
+            updateActiveChatsIfNeeded();
+        })();
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
             textarea.select();
             document.execCommand('copy');
-            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!\n우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
+            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!
+우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
             if (typeof ChannelIO !== 'undefined') {
                 ChannelIO('showMessenger');
             } else {
