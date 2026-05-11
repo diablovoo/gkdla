@@ -545,7 +545,6 @@
             updateActiveChatsIfNeeded();
         })();
 
-
         function showCopyToast(message) {
             let toast = document.getElementById('copyToast');
             if (!toast) {
@@ -554,82 +553,34 @@
                 toast.className = 'copy-toast';
                 document.body.appendChild(toast);
             }
-
             toast.textContent = message;
             toast.classList.add('show');
-
             clearTimeout(window.copyToastTimer);
-            window.copyToastTimer = setTimeout(() => {
-                toast.classList.remove('show');
-            }, 1300);
-        }
-
-        async function copyProduct(text) {
-            const textarea = document.getElementById('orderText');
-
-            const orderText =
-`물품정보: ${text}
-수량: 
-
-[구매자 정보]
-배틀태그: 
-입금자명: `;
-
-            if (textarea) {
-                textarea.value = orderText;
-            }
-
-            try {
-                await navigator.clipboard.writeText(orderText);
-            } catch (e) {
-                const temp = document.createElement('textarea');
-                temp.value = orderText;
-                temp.style.position = 'fixed';
-                temp.style.left = '-9999px';
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand('copy');
-                document.body.removeChild(temp);
-            }
-
-            showCopyToast('복사됨: ' + text);
-        }
-
-
-        function showCopyToast(message) {
-            let toast = document.getElementById('copyToast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'copyToast';
-                toast.className = 'copy-toast';
-                document.body.appendChild(toast);
-            }
-
-            toast.textContent = message;
-            toast.classList.add('show');
-
-            clearTimeout(window.copyToastTimer);
-            window.copyToastTimer = setTimeout(() => {
+            window.copyToastTimer = setTimeout(function () {
                 toast.classList.remove('show');
             }, 1400);
         }
 
         function makeOrderText(productText) {
-            return `물품정보: ${productText}
-수량: 
+            return '물품정보: ' + productText + '
+' +
+                   '수량: 
 
-[구매자 정보]
-배틀태그: 
-입금자명: `;
+' +
+                   '[구매자 정보]
+' +
+                   '배틀태그: 
+' +
+                   '입금자명: ';
         }
 
-        function fallbackCopyText(text) {
+        function legacyCopy(text) {
             const temp = document.createElement('textarea');
             temp.value = text;
             temp.setAttribute('readonly', '');
             temp.style.position = 'fixed';
-            temp.style.top = '0';
             temp.style.left = '-9999px';
+            temp.style.top = '0';
             temp.style.opacity = '0';
             document.body.appendChild(temp);
             temp.focus();
@@ -646,65 +597,79 @@
             return ok;
         }
 
-        async function copyProduct(productText) {
+        function copyProduct(productText) {
             const orderText = makeOrderText(productText);
-            const orderTextarea = document.getElementById('orderText');
+            const textarea = document.getElementById('orderText');
 
-            if (orderTextarea) {
-                orderTextarea.value = orderText;
-                orderTextarea.focus();
-                orderTextarea.select();
+            if (textarea) {
+                textarea.value = orderText;
+                textarea.focus();
+                textarea.select();
             }
 
-            let copied = false;
+            // execCommand를 먼저 사용: 파일/미리보기/깃허브에서 제일 호환성이 좋음
+            const copiedByLegacy = legacyCopy(orderText);
 
-            if (navigator.clipboard && window.isSecureContext) {
-                try {
-                    await navigator.clipboard.writeText(orderText);
-                    copied = true;
-                } catch (e) {
-                    copied = false;
-                }
-            }
-
-            if (!copied) {
-                copied = fallbackCopyText(orderText);
-            }
-
-            if (copied) {
+            if (copiedByLegacy) {
                 showCopyToast('복사됨: ' + productText);
+                return;
+            }
+
+            // 보안 컨텍스트에서는 Clipboard API도 시도
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(orderText)
+                    .then(function () {
+                        showCopyToast('복사됨: ' + productText);
+                    })
+                    .catch(function () {
+                        showCopyToast('복사 실패: 주문서 칸 선택 후 Ctrl+C');
+                    });
             } else {
-                showCopyToast('복사 실패: 주문서 칸에서 Ctrl+C 해주세요');
+                showCopyToast('주문서 입력 완료: Ctrl+C 눌러 복사');
             }
         }
 
         window.copyProduct = copyProduct;
 
         document.addEventListener('click', function (event) {
-            const target = event.target.closest('.copy-price');
-            if (!target) return;
+            const item = event.target.closest('.copy-price');
+            if (!item) return;
+
+            const productText = item.getAttribute('data-copy');
+            if (!productText) return;
 
             event.preventDefault();
             event.stopPropagation();
-
-            const productText = target.getAttribute('data-copy');
-            if (productText) {
-                copyProduct(productText);
-            }
+            copyProduct(productText);
         });
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
+            textarea.focus();
             textarea.select();
-            document.execCommand('copy');
-            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!
-우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
+
+            const text = textarea.value || '';
+            const copiedByLegacy = legacyCopy(text);
+
+            if (copiedByLegacy) {
+                showCopyToast('주문서가 복사되었습니다');
+            } else if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text)
+                    .then(function () {
+                        showCopyToast('주문서가 복사되었습니다');
+                    })
+                    .catch(function () {
+                        alert('복사가 막혔습니다. 주문서 칸을 선택한 뒤 Ctrl+C로 복사해주세요.');
+                    });
+            } else {
+                alert('주문서 칸을 선택했습니다. Ctrl+C로 복사해주세요.');
+            }
+
             if (typeof ChannelIO !== 'undefined') {
                 ChannelIO('showMessenger');
-            } else {
-                alert('채널톡 플러그인을 불러오는 중입니다. 잠시 후 우측 하단 버튼을 눌러주세요.');
             }
         }
+
     </script>
 </body>
 </html>
