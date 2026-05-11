@@ -20,7 +20,7 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* 전광판 (왼쪽에서 오른쪽으로 흐르는 애니메이션) */
+        /* 전광판 애니메이션 */
         @keyframes marquee-ltr {
             0% { transform: translateX(-50%); }
             100% { transform: translateX(0%); }
@@ -40,6 +40,30 @@
         }
         .animate-blob { animation: blob 7s infinite; }
         .animation-delay-2000 { animation-delay: 2s; }
+
+        /* 💡 클릭 가능한 가격 배지 스타일 추가 💡 */
+        .price-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            background-color: #f1f5f9;
+            color: #334155;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            border: 1px solid #e2e8f0;
+        }
+        .price-badge:hover {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            border-color: #c7d2fe;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(99, 102, 241, 0.1);
+        }
+        .price-badge:active {
+            transform: translateY(0);
+        }
     </style>
 
     <!-- 👇 사장님 채널톡 스크립트 👇 -->
@@ -53,248 +77,325 @@
 </head>
 <body class="flex flex-col items-center min-h-screen p-4 sm:p-6 relative pt-8">
 
-    <!-- 배경 효과용 고정 컨테이너 (sticky 오류 방지를 위해 overflow 속성 분리) -->
+    <!-- 배경 효과용 고정 컨테이너 -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
         <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
     </div>
 
-    <!-- 실시간 통계 배너 -->
-    <div class="w-full max-w-3xl bg-white/90 backdrop-blur-md border border-slate-200 rounded-full px-4 sm:px-8 py-3 mb-6 relative z-20 shadow-[0_2px_15px_rgb(0,0,0,0.04)] flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-[13px] sm:text-[14px] text-slate-500 font-medium transition-all">
-        <div class="flex items-center gap-2">
-            <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
-            </span>
-            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 명</span>
+    <!-- 1단 세로 정렬(flex-col) 컨테이너 -->
+    <div class="w-full max-w-3xl mx-auto flex flex-col gap-6 lg:gap-8 items-center relative z-10 mb-28 font-sans">
+
+        <!-- 1. 실시간 통계 배너 -->
+        <div class="w-full bg-white/90 backdrop-blur-md border border-slate-200 rounded-full px-4 sm:px-8 py-3 shadow-[0_2px_15px_rgb(0,0,0,0.04)] flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-[13px] sm:text-[14px] text-slate-500 font-medium transition-all">
+            <div class="flex items-center gap-2">
+                <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
+                    <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
+                </span>
+                <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 명</span>
+            </div>
+            <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
+            <div class="flex items-center">
+                <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
+            </div>
+            <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
+            <div class="flex items-center">
+                <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
+            </div>
         </div>
-        <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
-        <div class="flex items-center">
-            <span class="text-slate-600">오늘 조회 <span id="todayViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
-        </div>
-        <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
-        <div class="flex items-center">
-            <span class="text-slate-600">누적 조회수 <span id="totalViews" class="font-black text-slate-900 text-[15px] sm:text-lg mx-1 inline-block min-w-[24px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 회</span>
-        </div>
-    </div>
 
-    <!-- 레이아웃 컨테이너 (스틱키 적용을 위해 items-start 사용) -->
-    <div class="w-full max-w-6xl flex flex-col md:flex-row gap-6 lg:gap-8 items-start justify-center relative z-10 mb-8 font-sans">
-
-        <!-- 왼쪽 영역: 메인 안내 + 리뷰 (위아래 배치) -->
-        <div class="flex-1 flex flex-col gap-6 w-full">
-            
-            <!-- 메인 주문 안내 카드 -->
-            <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)]">
-                <div class="flex flex-col items-center mb-6">
-                    <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
-                        <i class="ph-fill ph-game-controller text-4xl text-white"></i>
-                    </div>
-                    <h1 class="text-3xl font-black tracking-tight text-slate-800 uppercase">GAMESHOP</h1>
-                    <p class="text-sm text-slate-500 mt-1 font-medium">안전하고 빠른 실시간 거래 전문 상점</p>
+        <!-- 2. 메인 주문 안내 카드 (단가표) -->
+        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)]">
+            <div class="flex flex-col items-center mb-6">
+                <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
+                    <i class="ph-fill ph-game-controller text-4xl text-white"></i>
                 </div>
-
-                <!-- 전광판 -->
-                <div class="overflow-hidden bg-blue-50 py-3 rounded-2xl border border-blue-100 shadow-inner mb-6 relative">
-                    <div class="animate-marquee-ltr font-bold text-blue-600 text-[15px] tracking-wide">
-                        <span>
-                            &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 골드 ✦ 룬셋 ✦ 옵두버스 ✦ 정복자 150/200 ✦ 하드코어 ✦ 극피강철십자가 ✦ 육성/버스
-                            &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 골드 ✦ 룬셋 ✦ 옵두버스 ✦ 정복자 150/200 ✦ 하드코어 ✦ 극피강철십자가 ✦ 육성/버스
-                        </span>
-                    </div>
-                </div>
-
-                <!-- 단가표 영역 -->
-                <div class="bg-white/60 border border-slate-200 rounded-2xl p-4 shadow-sm">
-                    <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><i class="ph-fill ph-list-dashes text-blue-500 text-lg"></i> 상품 안내</h3>
-                    
-                    <div class="h-[350px] overflow-y-auto text-[13px] text-slate-600 space-y-4 pr-3 font-medium custom-scrollbar">
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">신화꾸러기 <span class="text-[11px] font-normal text-slate-400 ml-1">(10분이내 출발 스피드 / 신화랜덤1개+벼락불1개)</span></p>
-                            <p class="mt-1 text-[12px]">1회 6,000원 / 5회 21,000원 / 10회 38,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">보물의틈새 <span class="text-[11px] font-normal text-slate-400 ml-1">(옵두사이트,니스아이언,분광경 획득)</span></p>
-                            <p class="mt-1 text-[12px]">1회 3,000원 / 5회 12,000원 / 10회 19,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">잊힌영혼 <span class="text-[11px] font-normal text-slate-400 ml-1">(바닥거래)</span></p>
-                            <p class="mt-1 text-[12px]">1,000개 12,000원 / 3,000개 33,000원 / 5,000개 60,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">골드 <span class="text-[11px] font-normal text-slate-400 ml-1">(999억 맥스)</span></p>
-                            <p class="mt-1 text-[12px] leading-relaxed">100억 5,000원 / 200억 9,000원 / 300억 13,000원<br>500억 20,000원 / 900억 34,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">상급열쇠 소굴</p>
-                            <p class="mt-1 text-[12px]">100개 6,000원 / 200개 10,000원 / 500개 17,000원 / 1000개 30,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">하급열쇠 소굴</p>
-                            <p class="mt-1 text-[12px]">100개 6,000원 / 200개 10,000원 / 500개 17,000원 / 1000개 30,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">벨리알 껍데기</p>
-                            <p class="mt-1 text-[12px] leading-relaxed">50개 6,000원 / 100개 10,000원 / 200개 19,000원<br>300개 26,000원 / 500개 38,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">웅장한 보석 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
-                            <p class="mt-1 text-[12px] leading-relaxed">1개 2,000원 / 5개 5,000원 / 10개 8,000원<br>20개 15,000원 / 50개 28,000원 / 100개 45,000원 <span class="text-blue-500 font-bold text-[11px] ml-1">(섞어서 가능)</span></p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">온전한 호라드림 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
-                            <p class="mt-1 text-[12px]">1개 10,000원 / 5개 40,000원 / 10개 70,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">룬셋 <span class="text-[11px] font-normal text-slate-400 ml-1">(영벌,수의,별반,샤코,한아비,셀리그,티리엘)</span></p>
-                            <p class="mt-1 text-[12px]">1셋 8,000원 / 3셋 20,000원 / 5셋 30,000원</p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">육성 / 정복자 대리 / 버스 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 1:1전담</span></p>
-                            <p class="mt-1 text-[12px] leading-relaxed">
-                                1-70레벨 6,000원 / 정복자1-100레벨 25,000원<br>
-                                만랩+정복자1-100 30,000원 / 시즌13 메인퀘 클 30,000원<br>
-                                나락100단 1시간 10,000원 / 고행8 릴리트1회 5,000원<br>
-                                고행10 메피스토 1회 10,000원
-                            </p>
-                        </div>
-                        <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">옵두버스 / 극피강철십자가 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 및 제작 문의</span></p>
-                        </div>
-                        <div class="text-red-600">
-                            <p class="font-bold text-[14px]">하드코어(Hardcore) 전품목 <span class="font-bold text-[11px] ml-1">▶ 별도 채팅 문의</span></p>
-                        </div>
-                    </div>
-                </div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-800 uppercase">GAMESHOP</h1>
+                <p class="text-sm text-slate-500 mt-1 font-medium">안전하고 빠른 실시간 거래 전문 상점</p>
             </div>
 
-            <!-- 하단 리뷰 카드 -->
-            <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] flex flex-col">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-star text-yellow-400 text-2xl"></i> 실시간 구매 후기</h2>
-                    <span class="bg-green-100 text-green-700 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
-                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> LIVE
+            <!-- 전광판 -->
+            <div class="overflow-hidden bg-blue-50 py-3 rounded-2xl border border-blue-100 shadow-inner mb-6 relative">
+                <div class="animate-marquee-ltr font-bold text-blue-600 text-[15px] tracking-wide">
+                    <span>
+                        &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 골드 ✦ 룬셋 ✦ 옵두버스 ✦ 정복자 150/200 ✦ 하드코어 ✦ 극피강철십자가 ✦ 육성/버스
+                        &nbsp;✦ 신화꾸러기 ✦ 보물의틈새 ✦ 웅장한 보석 ✦ 온전한 호라드림 ✦ 골드 ✦ 룬셋 ✦ 옵두버스 ✦ 정복자 150/200 ✦ 하드코어 ✦ 극피강철십자가 ✦ 육성/버스
                     </span>
                 </div>
-
-                <div class="flex-1 overflow-y-auto custom-scrollbar pr-3 space-y-3 max-h-[400px]">
-                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">초</div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-700">초보#2***</p>
-                                    <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] text-slate-400">2시간 전</span>
-                        </div>
-                        <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
-                            정복자 200 대리 맡겼는데 속도 ㄹㅇ개빠름. 사장님이 서비스로 2만원치 아이템 더 챙겨주셔서 너무 감동받았습니다. 여기서살께요 ㄹㅇ
-                        </p>
-                    </div>
-
-                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">G</div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-700">Gem#9***</p>
-                                    <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] text-slate-400">방금 전</span>
-                        </div>
-                        <p class="text-[13px] text-slate-600 font-medium leading-relaxed">온전한 호라드림 보석 종류별로 대량 주문했는데 5분도 안돼서 배달 오네요 ㅋㅋ 역시 속도는 개빠릅니다.</p>
-                    </div>
-
-                    <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">무</div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-700">무적#4***</p>
-                                    <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] text-slate-400">30분 전</span>
-                        </div>
-                        <p class="text-[13px] text-slate-600 font-medium leading-relaxed">하드코어라 템 구하기 진짜 빡셌는데 골드와 보석, 극피 세팅까지 완벽하게 맞춰주셨습니다. 덕분에 고행 나락 등반 편하게 하네요.</p>
-                    </div>
-
-                    <div class="bg-pink-50/50 border border-pink-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
-                        <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
-                                <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">Z</div>
-                                <div>
-                                    <p class="text-xs font-bold text-slate-700">Zea#3***</p>
-                                    <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
-                                </div>
-                            </div>
-                            <span class="text-[10px] text-slate-400">1시간 전</span>
-                        </div>
-                        <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
-                            결혼 프사 했다고 벨리알 껍데기 500개나 더 챙겨주셔서 정말 고맙습니다 사장님! 축의금으로 대신 받은 거 같아서 기분이 너무 좋네요.. 인심 너무 좋으셔서 다음에 또 주문하겠습니다 대박나세요!!
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="mt-4 pt-4 border-t border-slate-100 text-center">
-                    <p class="text-[11px] font-medium text-slate-500 flex items-center justify-center gap-1.5 italic"><i class="ph-fill ph-gift text-indigo-500 text-lg"></i> 후기 작성 시 다음 거래 서비스 증정!</p>
-                </div>
             </div>
 
-        </div> <!-- 왼쪽 영역 끝 -->
-
-        <!-- 오른쪽 영역: 스크롤해도 따라다니는 독립된 주문서 양식 (Sticky) -->
-        <div class="w-full md:w-[320px] lg:w-[360px] shrink-0 sticky top-6 z-20 self-start">
-            <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.18)]">
-                <label class="flex items-center gap-2 text-base font-bold text-slate-800 mb-2">
-                    <i class="ph-fill ph-clipboard-text text-indigo-500 text-xl"></i> 주문서 작성
-                </label>
-                <p class="text-[12px] text-slate-500 mb-4 leading-relaxed">단가표를 확인하시고, 원하시는 물품과 수량을 적어 상담을 시작해주세요.</p>
+            <!-- 단가표 영역 -->
+            <div class="bg-white/60 border border-slate-200 rounded-2xl p-4 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-1.5 flex-wrap">
+                    <i class="ph-fill ph-list-dashes text-blue-500 text-lg"></i> 상품 안내 
+                    <span class="text-[11px] font-bold text-indigo-600 ml-1 bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-full animate-pulse shadow-sm flex items-center gap-1">
+                        <i class="ph-fill ph-cursor-click"></i> 가격을 누르면 자동 입력됩니다!
+                    </span>
+                </h3>
                 
-                <textarea id="orderText" class="w-full h-[180px] bg-slate-50 text-[13px] text-slate-700 p-4 rounded-2xl border border-slate-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all resize-none outline-none font-mono custom-scrollbar mb-4">
-물품정보: 
-수량: 
+                <!-- 💡 자동 입력 배지(버튼)들로 변경 💡 -->
+                <div class="h-[400px] overflow-y-auto text-[13px] text-slate-600 space-y-5 pr-3 font-medium custom-scrollbar">
+                    
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">신화꾸러기 <span class="text-[11px] font-normal text-slate-400 ml-1">(10분이내 출발 스피드 / 신화랜덤1+벼락불1)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('신화꾸러기', '1회 (6,000원)')">1회 6,000원</span>
+                            <span class="price-badge" onclick="selectItem('신화꾸러기', '5회 (21,000원)')">5회 21,000원</span>
+                            <span class="price-badge" onclick="selectItem('신화꾸러기', '10회 (38,000원)')">10회 38,000원</span>
+                        </div>
+                    </div>
+                    
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">보물의틈새 <span class="text-[11px] font-normal text-slate-400 ml-1">(옵두사이트,니스아이언,분광경 획득)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('보물의틈새', '1회 (3,000원)')">1회 3,000원</span>
+                            <span class="price-badge" onclick="selectItem('보물의틈새', '5회 (12,000원)')">5회 12,000원</span>
+                            <span class="price-badge" onclick="selectItem('보물의틈새', '10회 (19,000원)')">10회 19,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">잊힌영혼 <span class="text-[11px] font-normal text-slate-400 ml-1">(바닥거래)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('잊힌영혼', '1,000개 (12,000원)')">1,000개 12,000원</span>
+                            <span class="price-badge" onclick="selectItem('잊힌영혼', '3,000개 (33,000원)')">3,000개 33,000원</span>
+                            <span class="price-badge" onclick="selectItem('잊힌영혼', '5,000개 (60,000원)')">5,000개 60,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">골드 <span class="text-[11px] font-normal text-slate-400 ml-1">(999억 맥스)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('골드', '100억 (5,000원)')">100억 5,000원</span>
+                            <span class="price-badge" onclick="selectItem('골드', '200억 (9,000원)')">200억 9,000원</span>
+                            <span class="price-badge" onclick="selectItem('골드', '300억 (13,000원)')">300억 13,000원</span>
+                            <span class="price-badge" onclick="selectItem('골드', '500억 (20,000원)')">500억 20,000원</span>
+                            <span class="price-badge" onclick="selectItem('골드', '900억 (34,000원)')">900억 34,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">상급열쇠 소굴</p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('상급열쇠 소굴', '100개 (6,000원)')">100개 6,000원</span>
+                            <span class="price-badge" onclick="selectItem('상급열쇠 소굴', '200개 (10,000원)')">200개 10,000원</span>
+                            <span class="price-badge" onclick="selectItem('상급열쇠 소굴', '500개 (17,000원)')">500개 17,000원</span>
+                            <span class="price-badge" onclick="selectItem('상급열쇠 소굴', '1000개 (30,000원)')">1000개 30,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">하급열쇠 소굴</p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('하급열쇠 소굴', '100개 (6,000원)')">100개 6,000원</span>
+                            <span class="price-badge" onclick="selectItem('하급열쇠 소굴', '200개 (10,000원)')">200개 10,000원</span>
+                            <span class="price-badge" onclick="selectItem('하급열쇠 소굴', '500개 (17,000원)')">500개 17,000원</span>
+                            <span class="price-badge" onclick="selectItem('하급열쇠 소굴', '1000개 (30,000원)')">1000개 30,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">벨리알 껍데기</p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('벨리알 껍데기', '50개 (6,000원)')">50개 6,000원</span>
+                            <span class="price-badge" onclick="selectItem('벨리알 껍데기', '100개 (10,000원)')">100개 10,000원</span>
+                            <span class="price-badge" onclick="selectItem('벨리알 껍데기', '200개 (19,000원)')">200개 19,000원</span>
+                            <span class="price-badge" onclick="selectItem('벨리알 껍데기', '300개 (26,000원)')">300개 26,000원</span>
+                            <span class="price-badge" onclick="selectItem('벨리알 껍데기', '500개 (38,000원)')">500개 38,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">웅장한 보석 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('웅장한 보석 (종류 기재 요망)', '1개 (2,000원)')">1개 2,000원</span>
+                            <span class="price-badge border-indigo-200" onclick="selectItem('웅장한 보석 (섞어서 가능 - 종류 기재 요망)', '5개 (5,000원)')">5개 5,000원</span>
+                            <span class="price-badge border-indigo-200" onclick="selectItem('웅장한 보석 (섞어서 가능 - 종류 기재 요망)', '10개 (8,000원)')">10개 8,000원</span>
+                            <span class="price-badge border-indigo-200" onclick="selectItem('웅장한 보석 (섞어서 가능 - 종류 기재 요망)', '20개 (15,000원)')">20개 15,000원</span>
+                            <span class="price-badge border-indigo-200" onclick="selectItem('웅장한 보석 (섞어서 가능 - 종류 기재 요망)', '50개 (28,000원)')">50개 28,000원</span>
+                            <span class="price-badge border-indigo-200" onclick="selectItem('웅장한 보석 (섞어서 가능 - 종류 기재 요망)', '100개 (45,000원)')">100개 45,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">온전한 호라드림 <span class="text-[11px] font-normal text-slate-400 ml-1">(루비,에메,토파,해골,사파,다이아,자수)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('온전한 호라드림 (종류 기재 요망)', '1개 (10,000원)')">1개 10,000원</span>
+                            <span class="price-badge" onclick="selectItem('온전한 호라드림 (종류 기재 요망)', '5개 (40,000원)')">5개 40,000원</span>
+                            <span class="price-badge" onclick="selectItem('온전한 호라드림 (종류 기재 요망)', '10개 (70,000원)')">10개 70,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">룬셋 <span class="text-[11px] font-normal text-slate-400 ml-1">(영벌,수의,별반,샤코,한아비,셀리그,티리엘)</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('룬셋', '1셋 (8,000원)')">1셋 8,000원</span>
+                            <span class="price-badge" onclick="selectItem('룬셋', '3셋 (20,000원)')">3셋 20,000원</span>
+                            <span class="price-badge" onclick="selectItem('룬셋', '5셋 (30,000원)')">5셋 30,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">육성 / 정복자 대리 / 버스 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 1:1전담</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge" onclick="selectItem('육성/대리 (1-70레벨)', '1회 (6,000원)')">1-70레벨 6,000원</span>
+                            <span class="price-badge" onclick="selectItem('육성/대리 (정복자 1-100레벨)', '1회 (25,000원)')">정복자1-100 25,000원</span>
+                            <span class="price-badge" onclick="selectItem('육성/대리 (만랩+정복자1-100)', '1회 (30,000원)')">만랩+정복자 30,000원</span>
+                            <span class="price-badge" onclick="selectItem('육성/대리 (시즌13 메인퀘 클리어)', '1회 (30,000원)')">메인퀘 클리어 30,000원</span>
+                            <span class="price-badge" onclick="selectItem('버스 (나락100단 1시간)', '1시간 (10,000원)')">나락100단 10,000원</span>
+                            <span class="price-badge" onclick="selectItem('버스 (고행8 릴리트)', '1회 (5,000원)')">고행8 릴리트 5,000원</span>
+                            <span class="price-badge" onclick="selectItem('버스 (고행10 메피스토)', '1회 (10,000원)')">고행10 메피스토 10,000원</span>
+                        </div>
+                    </div>
+
+                    <div class="border-b border-slate-100 pb-4">
+                        <p class="font-bold text-slate-800 text-[14px]">옵두버스 / 극피강철십자가 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 및 제작 문의</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge border-red-200 text-red-600 hover:text-red-700 hover:bg-red-50" onclick="selectItem('옵두버스 / 극피강철십자가', '별도 상담 (시세 문의)')">💬 클릭하여 문의 내용 작성하기</span>
+                        </div>
+                    </div>
+
+                    <div class="text-red-600">
+                        <p class="font-bold text-[14px]">하드코어(Hardcore) 전품목 <span class="font-bold text-[11px] ml-1">▶ 별도 채팅 문의</span></p>
+                        <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                            <span class="price-badge bg-red-50 text-red-600 border-red-200 hover:bg-red-100 hover:text-red-700" onclick="selectItem('[하드코어] 구매 상담', '별도 상담 (품목 기재)')">💬 하드코어 전용 문의 작성하기</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 주문서 작성 카드 -->
+        <div id="orderSection" class="bg-white/90 backdrop-blur-xl border border-indigo-200 rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.18)]">
+            <div class="flex items-center justify-between mb-2">
+                <label class="flex items-center gap-2 text-xl font-bold text-slate-800">
+                    <i class="ph-fill ph-clipboard-text text-indigo-500 text-2xl"></i> 주문서 작성
+                </label>
+                <!-- 추가된 초기화 버튼 -->
+                <button onclick="clearOrder()" class="text-[12px] text-slate-500 hover:text-red-500 flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors">
+                    <i class="ph-bold ph-trash"></i> 초기화
+                </button>
+            </div>
+            <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">단가표를 확인하시고, 원하시는 물품과 수량을 적어 상담을 시작해주세요.</p>
+            
+            <textarea id="orderText" class="w-full h-[150px] bg-slate-50 text-[14px] text-slate-800 p-5 rounded-2xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 resize-none outline-none font-mono custom-scrollbar mb-4 font-medium placeholder-slate-400">
+물품정보 및 수량: 
+
 
 [구매자 정보]
 배틀태그: 
 입금자명: </textarea>
 
-                <button onclick="processOrder()" class="w-full relative overflow-hidden group bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2">
-                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                    <!-- 요청하신 대로 채널톡 아이콘으로 복구 -->
-                    <i class="ph-fill ph-chat-circle-dots text-xl text-white relative z-10"></i> 
-                    <span class="relative z-10 text-[15px]">주문서 복사하고 상담 시작하기</span>
-                </button>
-                <p class="text-[11px] text-center text-slate-400 mt-3">버튼을 누르면 우측 하단 채널톡이 열립니다.</p>
+            <button onclick="processOrder()" class="w-full relative overflow-hidden group bg-slate-900 hover:bg-black text-white font-bold py-4 rounded-2xl shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex justify-center items-center gap-2">
+                <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-blue-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <i class="ph-fill ph-chat-circle-dots text-xl text-white relative z-10"></i> 
+                <span class="relative z-10 text-[15px]">주문서 복사하고 상담 시작하기</span>
+            </button>
+            <p class="text-[11px] text-center text-slate-400 mt-3">버튼을 누르면 우측 하단 채널톡이 열립니다.</p>
+        </div>
+
+        <!-- 4. 하단 리뷰 카드 -->
+        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] flex flex-col">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-star text-yellow-400 text-2xl"></i> 실시간 구매 후기</h2>
+                <span class="bg-green-100 text-green-700 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> LIVE
+                </span>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar pr-3 space-y-3 max-h-[400px]">
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">초</div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">초보#2***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">2시간 전</span>
+                    </div>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
+                        정복자 200 대리 맡겼는데 속도 ㄹㅇ개빠름. 사장님이 서비스로 2만원치 아이템 더 챙겨주셔서 너무 감동받았습니다. 여기서살께요 ㄹㅇ
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">G</div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">Gem#9***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">방금 전</span>
+                    </div>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">온전한 호라드림 보석 종류별로 대량 주문했는데 5분도 안돼서 배달 오네요 ㅋㅋ 역시 속도는 개빠릅니다.</p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">무</div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">무적#4***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">30분 전</span>
+                    </div>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">하드코어라 템 구하기 진짜 빡셌는데 골드와 보석, 극피 세팅까지 완벽하게 맞춰주셨습니다. 덕분에 고행 나락 등반 편하게 하네요.</p>
+                </div>
+
+                <div class="bg-pink-50/50 border border-pink-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">Z</div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">Zea#3***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-400">1시간 전</span>
+                    </div>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
+                        결혼 프사 했다고 벨리알 껍데기 500개나 더 챙겨주셔서 정말 고맙습니다 사장님! 축의금으로 대신 받은 거 같아서 기분이 너무 좋네요.. 인심 너무 좋으셔서 다음에 또 주문하겠습니다 대박나세요!!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-4 pt-4 border-t border-slate-100 text-center">
+                <p class="text-[11px] font-medium text-slate-500 flex items-center justify-center gap-1.5 italic"><i class="ph-fill ph-gift text-indigo-500 text-lg"></i> 후기 작성 시 다음 거래 서비스 증정!</p>
             </div>
         </div>
 
     </div>
 
-    <!-- 모바일 전용 하단 고정 주문 버튼 (모바일에서 스크롤 시 항상 보이도록) -->
-    <div class="fixed bottom-6 left-4 z-40 md:hidden" style="width: calc(100% - 150px);">
-        <button onclick="processOrder()" class="w-full bg-[#0f172a] text-white font-bold py-3.5 rounded-2xl shadow-2xl flex justify-center items-center gap-1.5 border border-slate-700/50 backdrop-blur-md">
-            <i class="ph-fill ph-chat-circle-dots text-lg text-white"></i> 
-            <span class="text-[13px] whitespace-nowrap">주문서 복사하고 상담</span>
+    <!-- 💡 하단 고정 플로팅 바 (주문서 복사 + 카톡 상담) 💡 -->
+    <div class="fixed bottom-6 px-4 w-full sm:w-auto sm:px-0 sm:right-[100px] z-50 flex items-center gap-2 sm:gap-3 justify-center sm:justify-end pointer-events-none">
+        
+        <!-- 주문서 복사 버튼 -->
+        <button onclick="processOrder()" class="pointer-events-auto flex-1 sm:flex-none bg-[#111827] hover:bg-black text-white font-bold py-3.5 px-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.3)] flex justify-center items-center gap-2 border border-slate-700/50 transition-all transform hover:-translate-y-1">
+            <i class="ph-fill ph-chat-circle-dots text-lg sm:text-xl text-white"></i> 
+            <span class="text-[13px] sm:text-[15px] whitespace-nowrap">주문서 복사하고 상담 시작하기</span>
         </button>
-    </div>
 
-    <!-- 우측 하단 고정 카카오톡 상담 버튼 -->
-    <a href="http://pf.kakao.com/_lxcsKX/chat" target="_blank" class="fixed bottom-6 right-4 sm:right-6 z-40 bg-[#FEE500] text-[#3A1D1D] font-bold py-3.5 px-4 sm:px-6 rounded-2xl sm:rounded-full shadow-2xl flex items-center gap-1.5 hover:shadow-xl transition-all transform hover:-translate-y-1 hover:scale-105">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 3c5.523 0 10 3.582 10 8s-4.477 8-10 8c-1.396 0-2.72-.253-3.92-.708L4.015 21.1a.75.75 0 0 1-1.077-.885l1.24-3.535C2.81 14.954 2 12.585 2 11c0-4.418 4.477-8 10-8z"/>
-        </svg>
-        <span class="text-[14px] sm:text-[16px] whitespace-nowrap">카톡 상담</span>
-    </a>
+        <!-- 카톡 상담 버튼 -->
+        <a href="http://pf.kakao.com/_lxcsKX/chat" target="_blank" class="pointer-events-auto shrink-0 bg-[#FEE500] text-[#3A1D1D] font-bold py-3.5 px-5 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.3)] flex justify-center items-center gap-1.5 hover:bg-[#e5ce00] transition-all transform hover:-translate-y-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 3c5.523 0 10 3.582 10 8s-4.477 8-10 8c-1.396 0-2.72-.253-3.92-.708L4.015 21.1a.75.75 0 0 1-1.077-.885l1.24-3.535C2.81 14.954 2 12.585 2 11c0-4.418 4.477-8 10-8z"/>
+            </svg>
+            <span class="text-[14px] sm:text-[16px] whitespace-nowrap">카톡 상담</span>
+        </a>
+    </div>
 
     <!-- 💡 알려주신 Firebase 정보 직접 적용 💡 -->
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // 사장님 진짜 정보
         const firebaseConfig = {
             apiKey: "AIzaSyC_JQ4NaFn8LrrBY6qYyDnAKoS-ed9g_aA",
             authDomain: "jinn-c154f.firebaseapp.com",
@@ -364,20 +465,81 @@
         incrementView();
     </script>
 
-    <!-- 상담중 인원 및 채널톡 복사 로직 -->
+    <!-- 커스텀 기능 스크립트 (자동 입력, 복사 등) -->
     <script>
-        // 상담중 인원 로직 (1~6명 사이, 정확히 10초마다 변경 = 20초에 2번)
+        // 💡 여러 상품을 담기 위한 목록 배열 및 총 금액 변수 💡
+        let selectedItemsList = [];
+        let totalAmount = 0;
+
+        // 💡 가격 버튼 클릭 시 주문서 자동 입력 및 금액 합산 기능 💡
+        function selectItem(itemName, itemPrice) {
+            const textarea = document.getElementById('orderText');
+            let currentText = textarea.value;
+            
+            // 고객이 미리 적어둔 배틀태그나 입금자명이 지워지지 않도록 [구매자 정보] 부분만 분리해서 보존
+            let buyerInfoPart = "[구매자 정보]\n배틀태그: \n입금자명: ";
+            const splitIndex = currentText.indexOf("[구매자 정보]");
+            if (splitIndex !== -1) {
+                buyerInfoPart = currentText.substring(splitIndex);
+            }
+            
+            // 새로운 아이템을 목록에 추가
+            selectedItemsList.push(`- ${itemName} / ${itemPrice}`);
+            
+            // 정규식을 사용해 텍스트에서 숫자만 추출하여 금액 합산 (예: "6,000원" -> 6000)
+            const priceMatch = itemPrice.match(/([0-9,]+)원/);
+            if (priceMatch) {
+                const priceValue = parseInt(priceMatch[1].replace(/,/g, ''), 10);
+                totalAmount += priceValue;
+            }
+            
+            // 총 금액 텍스트 생성
+            let totalText = "";
+            if (totalAmount > 0) {
+                totalText = `\n\n총 금액: ${totalAmount.toLocaleString()}원`;
+            } else if (selectedItemsList.length > 0) {
+                totalText = `\n\n총 금액: 별도 안내 (상담 후 결정)`;
+            }
+            
+            // 주문서 양식에 누적된 내용과 총 금액 채우기
+            textarea.value = `물품정보 및 수량:\n${selectedItemsList.join('\n')}${totalText}\n\n\n${buyerInfoPart}`;
+            
+            // 주문서 영역으로 부드럽게 스크롤 이동
+            const orderSection = document.getElementById('orderSection');
+            orderSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // 시각적 강조 효과 (파란색 테두리 깜빡임)
+            textarea.classList.remove('border-slate-300');
+            textarea.classList.add('border-indigo-600', 'ring-4', 'ring-indigo-500/30', 'bg-indigo-50');
+            
+            // 깜빡임 후 원상복구
+            setTimeout(() => {
+                textarea.classList.add('border-slate-300');
+                textarea.classList.remove('border-indigo-600', 'ring-4', 'ring-indigo-500/30', 'bg-indigo-50');
+                // 남은 정보를 적을 수 있도록 포커스 이동
+                textarea.focus();
+            }, 800);
+        }
+
+        // 주문서 초기화 기능 (금액도 함께 초기화)
+        function clearOrder() {
+            selectedItemsList = [];
+            totalAmount = 0;
+            document.getElementById('orderText').value = "물품정보 및 수량:\n\n\n[구매자 정보]\n배틀태그: \n입금자명: ";
+        }
+
+        // 상담중 인원 로직
         function updateActiveChats() {
             const activeChatsEl = document.getElementById('activeChats');
             if(activeChatsEl) {
-                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1; // 1~6 랜덤
+                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1;
             }
         }
         
         updateActiveChats();
         setInterval(updateActiveChats, 10000);
 
-        // 주문서 복사하고 채널톡 열기 (카톡 연동 제거, 채널톡 기능 복구)
+        // 주문서 복사하고 채널톡 열기
         function processOrder() {
             const textarea = document.getElementById('orderText');
             textarea.select();
