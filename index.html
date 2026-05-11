@@ -42,7 +42,6 @@
         .animation-delay-2000 { animation-delay: 2s; }
     </style>
 
-    <!-- 👇 사장님 채널톡 스크립트 👇 -->
     <script>
         (function(){var w=window;if(w.ChannelIO){return w.console.error("ChannelIO script included twice.");}var ch=function(){ch.c(arguments);};ch.q=[];ch.c=function(args){ch.q.push(args);};w.ChannelIO=ch;function l(){if(w.ChannelIOInitialized){return;}w.ChannelIOInitialized=true;var s=document.createElement("script");s.type="text/javascript";s.async=true;s.src="https://cdn.channel.io/plugin/ch-plugin-web.js";var x=document.getElementsByTagName("script")[0];if(x.parentNode){x.parentNode.insertBefore(s,x);}}if(document.readyState==="complete"){l();}else{w.addEventListener("DOMContentLoaded",l);w.addEventListener("load",l);}})();
 
@@ -53,17 +52,15 @@
 </head>
 <body class="flex flex-col items-center min-h-screen p-4 sm:p-6 relative overflow-x-hidden pt-8">
 
-    <!-- 장식용 배경 효과 -->
     <div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob pointer-events-none"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000 pointer-events-none"></div>
 
-    <!-- 실시간 통계 배너 -->
     <div class="w-full max-w-3xl bg-white/90 backdrop-blur-md border border-slate-200 rounded-full px-4 sm:px-8 py-3 mb-6 relative z-20 shadow-[0_2px_15px_rgb(0,0,0,0.04)] flex flex-wrap justify-center items-center gap-3 sm:gap-6 text-[13px] sm:text-[14px] text-slate-500 font-medium transition-all">
         <div class="flex items-center gap-2">
             <span class="bg-red-50 text-red-600 border border-red-100 px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-bold flex items-center gap-1.5 shadow-sm">
                 <span class="w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span> LIVE
             </span>
-            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center">3</span> 명</span>
+            <span class="text-slate-600">현재 상담중 <span id="activeChats" class="font-black text-slate-900 text-[15px] sm:text-lg ml-1 inline-block min-w-[16px] text-center"><i class="ph ph-circle-notch animate-spin text-slate-300 text-sm"></i></span> 명</span>
         </div>
         <div class="hidden sm:block w-px h-3.5 bg-slate-300"></div>
         <div class="flex items-center">
@@ -75,11 +72,9 @@
         </div>
     </div>
 
-    <!-- 레이아웃 컨테이너 -->
-    <div class="w-full max-w-3xl flex flex-col gap-6 lg:gap-8 items-center justify-center relative z-10 mb-8 font-sans">
+    <div class="w-full max-w-5xl flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch justify-center relative z-10 mb-8 font-sans">
 
-        <!-- 메인 주문 카드 -->
-        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-2xl mx-auto shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] shrink-0">
+        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-lg mx-auto shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] shrink-0">
             
             <div class="flex flex-col items-center mb-6">
                 <div class="w-16 h-16 bg-gradient-to-tr from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30 mb-4 transform -rotate-3 hover:rotate-0 transition-transform cursor-pointer">
@@ -89,7 +84,6 @@
                 <p class="text-sm text-slate-500 mt-1 font-medium">안전하고 빠른 실시간 거래 전문 상점</p>
             </div>
 
-            <!-- 전광판 -->
             <div class="overflow-hidden bg-blue-50 py-3 rounded-2xl border border-blue-100 shadow-inner mb-6 relative">
                 <div class="animate-marquee-ltr font-bold text-blue-600 text-[15px] tracking-wide">
                     <span>
@@ -100,7 +94,6 @@
             </div>
 
             <div class="space-y-6">
-                <!-- 단가표 영역 -->
                 <div class="bg-white/60 border border-slate-200 rounded-2xl p-4 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><i class="ph-fill ph-list-dashes text-blue-500 text-lg"></i> 상품 안내 <span class="text-[11px] font-normal text-slate-500 ml-1">(채팅 문의 부탁드립니다)</span></h3>
                     
@@ -135,7 +128,6 @@
                     </div>
                 </div>
 
-                <!-- 주문서 양식 -->
                 <div>
                     <label class="flex items-center gap-2 text-sm font-bold text-slate-700 mb-2">
                         <i class="ph-fill ph-clipboard-text text-slate-400 text-lg"></i> 복사될 주문서 양식
@@ -157,8 +149,7 @@
             </div>
         </div>
 
-        <!-- 우측: 실시간 구매 후기 -->
-        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-2xl mx-auto shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] flex flex-col">
+        <div class="bg-white/90 backdrop-blur-xl border border-white rounded-3xl p-6 sm:p-8 w-full max-w-lg mx-auto lg:max-w-md shadow-[0_8px_30px_rgb(0,0,0,0.08)] relative z-10 transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.12)] flex flex-col">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-extrabold text-slate-800 flex items-center gap-2"><i class="ph-fill ph-star text-yellow-400 text-2xl"></i> 구매 후기</h2>
                 <span class="bg-green-100 text-green-700 text-[11px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm">
@@ -166,47 +157,68 @@
                 </span>
             </div>
 
-            <div class="flex-1 overflow-y-auto custom-scrollbar pr-3 space-y-3 max-h-[420px]">
+            <div class="flex-1 overflow-y-auto custom-scrollbar pr-3 space-y-3 max-h-[650px]">
+                
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-sm">초</div>
-                            <div><p class="text-xs font-bold text-slate-700">초보#2***</p><div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div></div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">초보#2***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
                         </div>
                         <span class="text-[10px] text-slate-400">2시간 전</span>
                     </div>
-                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">정복자 200 대리 맡겼는데 속도 ㄹㅇ개빠름. 사장님이 서비스로 2만원치 아이템 더 챙겨주셔서 너무 감동받았습니다. 여기서살께요 ㄹㅇ</p>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
+                        정복자 200 대리 맡겼는데 속도 ㄹㅇ개빠름. 사장님이 서비스로 2만원치 아이템 더 챙겨주셔서 너무 감동받았습니다. 여기서살께요 ㄹㅇ
+                    </p>
                 </div>
+
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-sm">G</div>
-                            <div><p class="text-xs font-bold text-slate-700">Gem#9***</p><div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div></div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">Gem#9***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
                         </div>
                         <span class="text-[10px] text-slate-400">방금 전</span>
                     </div>
                     <p class="text-[13px] text-slate-600 font-medium leading-relaxed">온전한 호라드림 보석 종류별로 대량 주문했는데 5분도 안돼서 배달 오네요 ㅋㅋ 역시 속도는 개빠릅니다.</p>
                 </div>
+
                 <div class="bg-slate-50 border border-slate-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center font-bold text-sm">무</div>
-                            <div><p class="text-xs font-bold text-slate-700">무적#4***</p><div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div></div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">무적#4***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
                         </div>
                         <span class="text-[10px] text-slate-400">30분 전</span>
                     </div>
                     <p class="text-[13px] text-slate-600 font-medium leading-relaxed">하드코어라 템 구하기 진짜 빡셌는데 골드와 보석, 극피 세팅까지 완벽하게 맞춰주셨습니다. 덕분에 고행 나락 등반 편하게 하네요.</p>
                 </div>
+
                 <div class="bg-pink-50/50 border border-pink-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
                     <div class="flex justify-between items-start mb-2">
                         <div class="flex items-center gap-2">
                             <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">Z</div>
-                            <div><p class="text-xs font-bold text-slate-700">Zea#3***</p><div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div></div>
+                            <div>
+                                <p class="text-xs font-bold text-slate-700">Zea#3***</p>
+                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
+                            </div>
                         </div>
                         <span class="text-[10px] text-slate-400">1시간 전</span>
                     </div>
-                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">결혼 프사 했다고 벨리알 껍데기 500개나 더 챙겨주셔서 정말 고맙습니다 사장님! 축의금으로 대신 받은 거 같아서 기분이 너무 좋네요.. 인심 너무 좋으셔서 다음에 또 주문하겠습니다 대박나세요!!</p>
+                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
+                        결혼 프사 했다고 벨리알 껍데기 500개나 더 챙겨주셔서 정말 고맙습니다 사장님! 축의금으로 대신 받은 거 같아서 기분이 너무 좋네요.. 인심 너무 좋으셔서 다음에 또 주문하겠습니다 대박나세요!!
+                    </p>
                 </div>
+
             </div>
             
             <div class="mt-4 pt-4 border-t border-slate-100 text-center">
@@ -215,229 +227,115 @@
         </div>
     </div>
 
-    <!-- Firebase Firestore REST 공용 조회수 카운터 v5 -->
-    <script>
-        (function () {
-            const todayViewsEl = document.getElementById('todayViews');
-            const totalViewsEl = document.getElementById('totalViews');
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-            const PROJECT_ID = 'jinn-c154f';
-            const COLLECTION = 'gameshop_public_stats';
-            const DOCUMENT = 'global_views_v1';
-            const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION}/${DOCUMENT}`;
+        // 설정 로드
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
-            function getKoreaDateKey() {
-                const parts = new Intl.DateTimeFormat('en-CA', {
-                    timeZone: 'Asia/Seoul',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit'
-                }).formatToParts(new Date());
+        // UI 요소
+        const todayViewsEl = document.getElementById('todayViews');
+        const totalViewsEl = document.getElementById('totalViews');
 
-                const y = parts.find(p => p.type === 'year').value;
-                const m = parts.find(p => p.type === 'month').value;
-                const d = parts.find(p => p.type === 'day').value;
-                return `${y}-${m}-${d}`;
-            }
+        // 초기화
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
-            function getIntField(doc, name) {
-                const field = doc && doc.fields && doc.fields[name];
-                if (!field) return 0;
-                if (field.integerValue !== undefined) return Number(field.integerValue);
-                if (field.doubleValue !== undefined) return Number(field.doubleValue);
-                return 0;
-            }
-
-            function getStringField(doc, name) {
-                const field = doc && doc.fields && doc.fields[name];
-                if (!field) return '';
-                return field.stringValue || '';
-            }
-
-            function render(today, total) {
-                if (todayViewsEl) todayViewsEl.textContent = Number(today || 0).toLocaleString('ko-KR');
-                if (totalViewsEl) totalViewsEl.textContent = Number(total || 0).toLocaleString('ko-KR');
-            }
-
-            function renderFail() {
-                if (todayViewsEl) todayViewsEl.textContent = 'DB확인';
-                if (totalViewsEl) totalViewsEl.textContent = 'DB확인';
-            }
-
-            async function readCounter() {
-                const res = await fetch(BASE_URL, { method: 'GET' });
-                if (res.status === 404) return null;
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(`READ ${res.status}: ${text}`);
+        async function initStats() {
+            try {
+                // 1. 인증 처리 (인증 완료까지 기다림)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
                 }
-                return await res.json();
-            }
 
-            async function createCounter(todayKey) {
-                const createUrl = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/${COLLECTION}?documentId=${DOCUMENT}`;
-                const body = {
-                    fields: {
-                        today_views: { integerValue: "1" },
-                        total_views: { integerValue: "1" },
-                        last_date: { stringValue: todayKey },
-                        updated_at: { integerValue: String(Date.now()) }
+                onAuthStateChanged(auth, async (user) => {
+                    if (!user) return;
+
+                    const todayKey = new Date().toISOString().split('T')[0];
+                    const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_stats', 'global_views_v2');
+
+                    // 2. 실시간 화면 업데이트 (리스너를 통해 서버 숫자를 UI에 즉시 반영)
+                    onSnapshot(statsDocRef, (docSnap) => {
+                        if (docSnap.exists()) {
+                            const data = docSnap.data();
+                            todayViewsEl.innerHTML = (data.today_views || 0).toLocaleString();
+                            totalViewsEl.innerHTML = (data.total_views || 0).toLocaleString();
+                        } else {
+                            todayViewsEl.innerHTML = "0";
+                            totalViewsEl.innerHTML = "0";
+                        }
+                    }, (error) => {
+                        console.error("Firestore sync error:", error);
+                    });
+
+                    // 3. 1씩 증가 로직 (백그라운드에서 안전하게 증가)
+                    if (!window.hasCountedView) {
+                        window.hasCountedView = true;
+                        
+                        try {
+                            const sfDoc = await getDoc(statsDocRef);
+                            if (!sfDoc.exists()) {
+                                await setDoc(statsDocRef, { 
+                                    total_views: 1, 
+                                    today_views: 1, 
+                                    last_date: todayKey 
+                                });
+                            } else {
+                                const data = sfDoc.data();
+                                if (data.last_date !== todayKey) {
+                                    await updateDoc(statsDocRef, {
+                                        total_views: increment(1),
+                                        today_views: 1,
+                                        last_date: todayKey
+                                    });
+                                } else {
+                                    await updateDoc(statsDocRef, {
+                                        total_views: increment(1),
+                                        today_views: increment(1)
+                                    });
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Write Error:", e);
+                        }
                     }
-                };
-
-                const res = await fetch(createUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
                 });
 
-                if (!res.ok && res.status !== 409) {
-                    const text = await res.text();
-                    throw new Error(`CREATE ${res.status}: ${text}`);
-                }
+            } catch (error) {
+                console.error("Auth/Stats error:", error);
             }
+        }
 
-            async function updateCounter(todayKey, todayViews, totalViews) {
-                const patchUrl =
-                    `${BASE_URL}?updateMask.fieldPaths=today_views&updateMask.fieldPaths=total_views&updateMask.fieldPaths=last_date&updateMask.fieldPaths=updated_at`;
-
-                const body = {
-                    fields: {
-                        today_views: { integerValue: String(todayViews) },
-                        total_views: { integerValue: String(totalViews) },
-                        last_date: { stringValue: todayKey },
-                        updated_at: { integerValue: String(Date.now()) }
-                    }
-                };
-
-                const res = await fetch(patchUrl, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
-                });
-
-                if (!res.ok) {
-                    const text = await res.text();
-                    throw new Error(`UPDATE ${res.status}: ${text}`);
-                }
-            }
-
-            async function countOnce() {
-                const todayKey = getKoreaDateKey();
-
-                let doc = await readCounter();
-
-                if (!doc) {
-                    await createCounter(todayKey);
-                    render(1, 1);
-                    return;
-                }
-
-                const lastDate = getStringField(doc, 'last_date');
-                const oldToday = getIntField(doc, 'today_views');
-                const oldTotal = getIntField(doc, 'total_views');
-
-                const nextToday = lastDate === todayKey ? oldToday + 1 : 1;
-                const nextTotal = oldTotal + 1;
-
-                await updateCounter(todayKey, nextToday, nextTotal);
-                render(nextToday, nextTotal);
-            }
-
-            async function refreshOnly() {
-                try {
-                    const doc = await readCounter();
-                    if (!doc) {
-                        render(0, 0);
-                        return;
-                    }
-                    render(getIntField(doc, 'today_views'), getIntField(doc, 'total_views'));
-                } catch (e) {
-                    console.error('[GAMESHOP] 조회수 읽기 실패:', e);
-                }
-            }
-
-            countOnce().catch((e) => {
-                console.error('[GAMESHOP] 조회수 증가 실패:', e);
-                renderFail();
-            });
-
-            setInterval(refreshOnly, 5000);
-        })();
+        // 실행
+        initStats();
     </script>
 
     <script>
-        // 상담중 인원 로직 - 새로고침해도 바로 안 바뀌고, 정해진 시간 간격으로만 변경
-        (function () {
-            const ACTIVE_CHAT_KEY = 'gameshop_active_chats_value';
-            const ACTIVE_CHAT_NEXT_KEY = 'gameshop_active_chats_next_update';
-            const ACTIVE_CHAT_MIN_DELAY = 10000; // 10초
-            const ACTIVE_CHAT_MAX_DELAY = 15000; // 15초
-
-            function safeStorageGet(key) {
-                try { return localStorage.getItem(key); } catch (e) { return null; }
+        // 상담중 인원 로직 (1~6명 사이, 로드 시 즉시 1번 실행 후 10~15초 랜덤 변동)
+        function updateActiveChats() {
+            const activeChatsEl = document.getElementById('activeChats');
+            if(activeChatsEl) {
+                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1;
             }
-
-            function safeStorageSet(key, value) {
-                try { localStorage.setItem(key, value); } catch (e) {}
-            }
-
-            function getRandomActiveChatDelay() {
-                return ACTIVE_CHAT_MIN_DELAY + Math.floor(Math.random() * (ACTIVE_CHAT_MAX_DELAY - ACTIVE_CHAT_MIN_DELAY + 1));
-            }
-
-            function getInitialActiveChats() {
-                const saved = Number(safeStorageGet(ACTIVE_CHAT_KEY));
-                if (saved >= 1 && saved <= 7) return saved;
-
-                const firstValue = Math.floor(Math.random() * 7) + 1;
-                safeStorageSet(ACTIVE_CHAT_KEY, String(firstValue));
-                safeStorageSet(ACTIVE_CHAT_NEXT_KEY, String(Date.now() + getRandomActiveChatDelay()));
-                return firstValue;
-            }
-
-            function renderActiveChats(value) {
-                const activeChatsEl = document.getElementById('activeChats');
-                if (activeChatsEl) activeChatsEl.textContent = value;
-            }
-
-            function makeNextActiveChats(current) {
-                const move = Math.random() > 0.5 ? 1 : -1;
-                let next = Number(current || 1) + move;
-
-                if (next < 1) next = 2;
-                if (next > 7) next = 6;
-
-                return next;
-            }
-
-            function updateActiveChatsIfNeeded() {
-                const now = Date.now();
-                let current = getInitialActiveChats();
-                let nextUpdateAt = Number(safeStorageGet(ACTIVE_CHAT_NEXT_KEY) || 0);
-
-                if (!nextUpdateAt || now >= nextUpdateAt) {
-                    current = makeNextActiveChats(current);
-                    safeStorageSet(ACTIVE_CHAT_KEY, String(current));
-                    nextUpdateAt = now + getRandomActiveChatDelay();
-                    safeStorageSet(ACTIVE_CHAT_NEXT_KEY, String(nextUpdateAt));
-                }
-
-                renderActiveChats(current);
-
-                const wait = Math.max(1000, nextUpdateAt - Date.now());
-                setTimeout(updateActiveChatsIfNeeded, wait);
-            }
-
-            updateActiveChatsIfNeeded();
-        })();
+        }
+        
+        // 페이지 열리자마자 1~6명 세팅
+        updateActiveChats();
+        
+        // 천천히 변경되도록 세팅
+        setInterval(updateActiveChats, 10000 + Math.random() * 5000);
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
             textarea.select();
             document.execCommand('copy');
-            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!
-우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
+            alert('✨ 주문서 양식이 클립보드에 복사되었습니다!\n우측 하단에 열리는 채팅창에 붙여넣기(Ctrl+V) 하신 후 정보를 입력해주세요.');
             if (typeof ChannelIO !== 'undefined') {
                 ChannelIO('showMessenger');
             } else {
