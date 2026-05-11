@@ -40,6 +40,42 @@
         }
         .animate-blob { animation: blob 7s infinite; }
         .animation-delay-2000 { animation-delay: 2s; }
+
+        .copy-price {
+            display: inline-block;
+            user-select: none;
+            cursor: pointer;
+            padding: 1px 4px;
+            border-radius: 6px;
+            transition: all 0.15s ease;
+        }
+        .copy-price:hover {
+            background: #eff6ff;
+            color: #2563eb;
+            font-weight: 700;
+        }
+        .copy-toast {
+            position: fixed;
+            left: 50%;
+            bottom: 28px;
+            transform: translateX(-50%);
+            background: rgba(15, 23, 42, 0.96);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25);
+            z-index: 99999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-6px);
+        }
+
     </style>
 
     <!-- 👇 사장님 채널톡 스크립트 👇 -->
@@ -104,33 +140,110 @@
                 <div class="bg-white/60 border border-slate-200 rounded-2xl p-4 shadow-sm">
                     <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5"><i class="ph-fill ph-list-dashes text-blue-500 text-lg"></i> 상품 안내 <span class="text-[11px] font-normal text-slate-500 ml-1">(채팅 문의 부탁드립니다)</span></h3>
                     
-                    <div class="h-44 overflow-y-auto text-[13px] text-slate-600 space-y-4 pr-3 font-medium custom-scrollbar">
+                    <div class="h-72 overflow-y-auto text-[13px] text-slate-600 space-y-4 pr-3 font-medium custom-scrollbar">
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">신화꾸러기 / 보물의틈새 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 채팅 문의</span></p>
-                            <p class="mt-1 text-[11px] text-slate-400">1회 / 5회 / 10회 (10분이내 출발 스피드)</p>
+                            <p class="font-bold text-slate-800 text-[14px]">신화꾸러기 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="신화꾸러기 1회 = 6,000원">1회 6,000원</span> / 
+                                <span class="copy-price" data-copy="신화꾸러기 5회 = 21,000원">5회 21,000원</span> / 
+                                <span class="copy-price" data-copy="신화꾸러기 10회 = 38,000원">10회 38,000원</span><br>
+                                10분이내 출발 스피드 · 신화랜덤 1개 + 벼락불 1개
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">웅장한 보석 / 온전한 호라드림 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 채팅 문의</span></p>
-                            <p class="mt-1 text-[11px] text-slate-400">루비,에메,토파,해골,사파,다이아,자수 (섞어서 가능)</p>
+                            <p class="font-bold text-slate-800 text-[14px]">보물의틈새 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="보물의틈새 1회 = 3,000원">1회 3,000원</span> / 
+                                <span class="copy-price" data-copy="보물의틈새 5회 = 12,000원">5회 12,000원</span> / 
+                                <span class="copy-price" data-copy="보물의틈새 10회 = 19,000원">10회 19,000원</span><br>
+                                옵두사이트, 니스아이언, 분광경 획득
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">옵두버스 (Obducite Bus) <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 채팅 문의</span></p>
+                            <p class="font-bold text-slate-800 text-[14px]">잊힌영혼 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">바닥거래<br>
+                                <span class="copy-price" data-copy="잊힌영혼 1,000개 = 12,000원">1,000개 12,000원</span> / 
+                                <span class="copy-price" data-copy="잊힌영혼 3,000개 = 33,000원">3,000개 33,000원</span> / 
+                                <span class="copy-price" data-copy="잊힌영혼 5,000개 = 60,000원">5,000개 60,000원</span>
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">골드 (999억 맥스) <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 채팅 문의</span></p>
+                            <p class="font-bold text-slate-800 text-[14px]">골드 (999억 맥스) <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="골드 100억 = 5,000원">100억 5,000원</span> / 
+                                <span class="copy-price" data-copy="골드 200억 = 9,000원">200억 9,000원</span> / 
+                                <span class="copy-price" data-copy="골드 300억 = 13,000원">300억 13,000원</span><br>
+                                <span class="copy-price" data-copy="골드 500억 = 20,000원">500억 20,000원</span> / 
+                                <span class="copy-price" data-copy="골드 900억 = 34,000원">900억 34,000원</span>
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">룬셋 / 재료 물품 일체 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 시세 채팅 문의</span></p>
+                            <p class="font-bold text-slate-800 text-[14px]">상급열쇠 소굴 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="상급열쇠 소굴 100개 = 6,000원">100개 6,000원</span> / 
+                                <span class="copy-price" data-copy="상급열쇠 소굴 200개 = 10,000원">200개 10,000원</span> / 
+                                <span class="copy-price" data-copy="상급열쇠 소굴 500개 = 17,000원">500개 17,000원</span> / 
+                                <span class="copy-price" data-copy="상급열쇠 소굴 1000개 = 30,000원">1000개 30,000원</span>
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">극피강철십자가 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 제작/구매 문의</span></p>
+                            <p class="font-bold text-slate-800 text-[14px]">하급열쇠 소굴 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="하급열쇠 소굴 100개 = 6,000원">100개 6,000원</span> / 
+                                <span class="copy-price" data-copy="하급열쇠 소굴 200개 = 10,000원">200개 10,000원</span> / 
+                                <span class="copy-price" data-copy="하급열쇠 소굴 500개 = 17,000원">500개 17,000원</span> / 
+                                <span class="copy-price" data-copy="하급열쇠 소굴 1000개 = 30,000원">1000개 30,000원</span>
+                            </p>
                         </div>
                         <div class="border-b border-slate-100 pb-3">
-                            <p class="font-bold text-slate-800 text-[14px]">육성 / 정복자 대리 (1:1전담) <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 요금 채팅 문의</span></p>
-                            <p class="mt-1 text-[11px] leading-relaxed">1-70 / 정복자 100·150·200 / 만랩 패키지 / 나락 / 릴리트&메피스토</p>
+                            <p class="font-bold text-slate-800 text-[14px]">벨리알 껍데기 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="벨리알 껍데기 50개 = 6,000원">50개 6,000원</span> / 
+                                <span class="copy-price" data-copy="벨리알 껍데기 100개 = 10,000원">100개 10,000원</span> / 
+                                <span class="copy-price" data-copy="벨리알 껍데기 200개 = 19,000원">200개 19,000원</span><br>
+                                <span class="copy-price" data-copy="벨리알 껍데기 300개 = 26,000원">300개 26,000원</span> / 
+                                <span class="copy-price" data-copy="벨리알 껍데기 500개 = 38,000원">500개 38,000원</span>
+                            </p>
                         </div>
-                        <div class="text-red-600">
-                            <p class="font-bold text-[14px]">하드코어(Hardcore) 전품목 <span class="font-bold text-[11px] ml-1">▶ 별도 채팅 문의</span></p>
+                        <div class="border-b border-slate-100 pb-3">
+                            <p class="font-bold text-slate-800 text-[14px]">웅장한 보석 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">루비, 에메, 토파, 해골, 사파, 다이아, 자수<br>
+                                <span class="copy-price" data-copy="웅장한 보석 1개 = 2,000원">1개 2,000원</span> / 
+                                <span class="copy-price" data-copy="웅장한 보석 5개 = 5,000원 (섞어서 가능)">5개 5,000원</span> / 
+                                <span class="copy-price" data-copy="웅장한 보석 10개 = 8,000원 (섞어서 가능)">10개 8,000원</span><br>
+                                <span class="copy-price" data-copy="웅장한 보석 20개 = 15,000원 (섞어서 가능)">20개 15,000원</span> / 
+                                <span class="copy-price" data-copy="웅장한 보석 50개 = 28,000원 (섞어서 가능)">50개 28,000원</span> / 
+                                <span class="copy-price" data-copy="웅장한 보석 100개 = 45,000원 (섞어서 가능)">100개 45,000원</span>
+                            </p>
+                        </div>
+                        <div class="border-b border-slate-100 pb-3">
+                            <p class="font-bold text-slate-800 text-[14px]">온전한 호라드림 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">루비, 에메, 토파, 해골, 사파, 다이아, 자수<br>
+                                <span class="copy-price" data-copy="온전한 호라드림 1개 = 10,000원">1개 10,000원</span> / 
+                                <span class="copy-price" data-copy="온전한 호라드림 5개 = 40,000원">5개 40,000원</span> / 
+                                <span class="copy-price" data-copy="온전한 호라드림 10개 = 70,000원">10개 70,000원</span>
+                            </p>
+                        </div>
+                        <div class="border-b border-slate-100 pb-3">
+                            <p class="font-bold text-slate-800 text-[14px]">룬셋 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">영벌, 수의, 별반, 샤코, 한아비, 셀리그, 티리엘<br>
+                                <span class="copy-price" data-copy="룬셋 1셋 = 8,000원">1셋 8,000원</span> / 
+                                <span class="copy-price" data-copy="룬셋 3셋 = 20,000원">3셋 20,000원</span> / 
+                                <span class="copy-price" data-copy="룬셋 5셋 = 30,000원">5셋 30,000원</span>
+                            </p>
+                        </div>
+                        <div class="border-b border-slate-100 pb-3">
+                            <p class="font-bold text-slate-800 text-[14px]">육성 / 대행 콘텐츠 <span class="text-blue-500 font-bold text-[11px] ml-1">▶ 수량 클릭 시 주문서 복사</span></p>
+                            <p class="mt-1 text-[11px] text-slate-400 leading-relaxed">
+                                <span class="copy-price" data-copy="1-70레벨 = 6,000원">1-70레벨 6,000원</span><br>
+                                <span class="copy-price" data-copy="정복자 1-100레벨 = 25,000원">정복자 1-100레벨 25,000원</span><br>
+                                <span class="copy-price" data-copy="만랩 + 정복자 1-100 = 30,000원">만랩 + 정복자 1-100 30,000원</span><br>
+                                <span class="copy-price" data-copy="시즌13 메인퀘 클 = 30,000원">시즌13 메인퀘 클 30,000원</span><br>
+                                <span class="copy-price" data-copy="나락100단 1시간 = 10,000원">나락100단 1시간 10,000원</span><br>
+                                <span class="copy-price" data-copy="고행8 릴리트 1회 = 5,000원">고행8 릴리트 1회 5,000원</span><br>
+                                <span class="copy-price" data-copy="고행10 메피스토 1회 = 10,000원">고행10 메피스토 1회 10,000원</span>
+                            </p>
+                        </div>
                         </div>
                     </div>
                 </div>
@@ -431,6 +544,154 @@
 
             updateActiveChatsIfNeeded();
         })();
+
+
+        function showCopyToast(message) {
+            let toast = document.getElementById('copyToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'copyToast';
+                toast.className = 'copy-toast';
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            clearTimeout(window.copyToastTimer);
+            window.copyToastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1300);
+        }
+
+        async function copyProduct(text) {
+            const textarea = document.getElementById('orderText');
+
+            const orderText =
+`물품정보: ${text}
+수량: 
+
+[구매자 정보]
+배틀태그: 
+입금자명: `;
+
+            if (textarea) {
+                textarea.value = orderText;
+            }
+
+            try {
+                await navigator.clipboard.writeText(orderText);
+            } catch (e) {
+                const temp = document.createElement('textarea');
+                temp.value = orderText;
+                temp.style.position = 'fixed';
+                temp.style.left = '-9999px';
+                document.body.appendChild(temp);
+                temp.select();
+                document.execCommand('copy');
+                document.body.removeChild(temp);
+            }
+
+            showCopyToast('복사됨: ' + text);
+        }
+
+
+        function showCopyToast(message) {
+            let toast = document.getElementById('copyToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'copyToast';
+                toast.className = 'copy-toast';
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            toast.classList.add('show');
+
+            clearTimeout(window.copyToastTimer);
+            window.copyToastTimer = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 1400);
+        }
+
+        function makeOrderText(productText) {
+            return `물품정보: ${productText}
+수량: 
+
+[구매자 정보]
+배틀태그: 
+입금자명: `;
+        }
+
+        function fallbackCopyText(text) {
+            const temp = document.createElement('textarea');
+            temp.value = text;
+            temp.setAttribute('readonly', '');
+            temp.style.position = 'fixed';
+            temp.style.top = '0';
+            temp.style.left = '-9999px';
+            temp.style.opacity = '0';
+            document.body.appendChild(temp);
+            temp.focus();
+            temp.select();
+
+            let ok = false;
+            try {
+                ok = document.execCommand('copy');
+            } catch (e) {
+                ok = false;
+            }
+
+            document.body.removeChild(temp);
+            return ok;
+        }
+
+        async function copyProduct(productText) {
+            const orderText = makeOrderText(productText);
+            const orderTextarea = document.getElementById('orderText');
+
+            if (orderTextarea) {
+                orderTextarea.value = orderText;
+                orderTextarea.focus();
+                orderTextarea.select();
+            }
+
+            let copied = false;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                try {
+                    await navigator.clipboard.writeText(orderText);
+                    copied = true;
+                } catch (e) {
+                    copied = false;
+                }
+            }
+
+            if (!copied) {
+                copied = fallbackCopyText(orderText);
+            }
+
+            if (copied) {
+                showCopyToast('복사됨: ' + productText);
+            } else {
+                showCopyToast('복사 실패: 주문서 칸에서 Ctrl+C 해주세요');
+            }
+        }
+
+        window.copyProduct = copyProduct;
+
+        document.addEventListener('click', function (event) {
+            const target = event.target.closest('.copy-price');
+            if (!target) return;
+
+            event.preventDefault();
+            event.stopPropagation();
+
+            const productText = target.getAttribute('data-copy');
+            if (productText) {
+                copyProduct(productText);
+            }
+        });
 
         function processOrder() {
             const textarea = document.getElementById('orderText');
