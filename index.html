@@ -134,36 +134,53 @@
             <!-- 2단 그리드 레이아웃 적용 (PC에서 양옆으로 2개씩) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <!-- 신화꾸러기 -->
+                <!-- 옵두 버스 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sparkle text-amber-500"></i> 신화꾸러기</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">신화랜덤 1개 + 벼락불 1개 · 10분이내 출발</p>
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-magic-wand text-purple-500"></i> 옵두 버스</h4>
+                    <p class="text-[11px] text-slate-400 mb-4">대량 재료 버스</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '신화꾸러기', '1회', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1회</span><span class="font-bold">6,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '옵두 버스', '2만개', '10,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">2만개</span><span class="font-bold">10,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '신화꾸러기', '5회', '21,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5회</span><span class="font-bold">21,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '옵두 버스', '5만개', '22,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">5만개</span><span class="font-bold">22,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '신화꾸러기', '10회', '38,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10회</span><span class="font-bold">38,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '옵두 버스', '10만개', '40,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">10만개</span><span class="font-bold">40,000원</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 보물의 틈새 -->
+                <!-- 지하도시 신화병기공물 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-diamond text-blue-500"></i> 보물의 틈새</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">옵두사이트 · 니스아이언 · 분광경 획득</p>
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sparkle text-amber-500"></i> 지하도시 신화병기공물</h4>
+                    <p class="text-[11px] text-slate-400 mb-4">신화랜덤1개~6개 랜덤드랍</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '보물의 틈새', '1회', '3,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1회</span><span class="font-bold">3,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '1회', '6,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">1회</span><span class="font-bold">6,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '보물의 틈새', '5회', '12,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5회</span><span class="font-bold">12,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '5회', '20,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">5회</span><span class="font-bold">20,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '보물의 틈새', '10회', '18,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10회</span><span class="font-bold">18,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '10회', '36,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">10회</span><span class="font-bold">36,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 잊힌 영혼 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-ghost text-teal-500"></i> 잊힌 영혼</h4>
+                    <p class="text-[11px] text-slate-400 mb-4">바닥거래</p>
+                    <div class="space-y-2">
+                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '1,000개', '7,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">7,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '3,000개', '19,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">3,000개</span><span class="font-bold">19,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '5,000개', '33,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">5,000개</span><span class="font-bold">33,000원</span>
                         </div>
                     </div>
                 </div>
@@ -173,31 +190,80 @@
                     <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-coin text-yellow-500"></i> 골드</h4>
                     <p class="text-[11px] text-slate-400 mb-4">999억 맥스</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '200억', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200억</span><span class="font-bold">5,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '골드', '100억', '5,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">100억</span><span class="font-bold">5,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '500억', '9,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500억</span><span class="font-bold">9,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '골드', '200억', '8,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">200억</span><span class="font-bold">8,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '900억', '13,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">900억</span><span class="font-bold">13,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '골드', '500억', '17,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">500억</span><span class="font-bold">17,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '골드', '900억', '30,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">900억</span><span class="font-bold">30,000원</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 하급/상급 열쇠 소굴 -->
+                <!-- 상급열쇠 소굴 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key text-slate-500"></i> 하급/상급 열쇠 소굴</h4>
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key text-slate-500"></i> 상급열쇠 소굴</h4>
                     <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '하급/상급 열쇠 소굴', '200개', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">5,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '100개', '6,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '하급/상급 열쇠 소굴', '500개', '10,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">10,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '200개', '9,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '하급/상급 열쇠 소굴', '1000개', '15,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">15,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '500개', '18,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '1000개', '32,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">32,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 하급열쇠 소굴 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key-return text-slate-400"></i> 하급열쇠 소굴</h4>
+                    <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
+                    <div class="space-y-2">
+                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '100개', '6,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '200개', '9,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '500개', '18,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '1000개', '32,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">32,000원</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 벨리알 껍데기 -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-drop text-rose-500"></i> 벨리알 껍데기</h4>
+                    <p class="text-[11px] text-slate-400 mb-4">보스 드롭 재료</p>
+                    <div class="space-y-2">
+                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '50개', '8,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">50개</span><span class="font-bold">8,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '100개', '15,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">15,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '200개', '25,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">25,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '300개', '35,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">300개</span><span class="font-bold">35,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '500개', '50,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">50,000원</span>
                         </div>
                     </div>
                 </div>
@@ -205,18 +271,18 @@
                 <!-- 웅장한 보석 -->
                 <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
                     <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-blue-400"></i> 웅장한 보석</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수 (섞어서 가능)</p>
+                    <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석', '5개', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">5,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '10개', '5,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">5,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석', '20개', '8,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '20개', '8,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">20개</span><span class="font-bold">8,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석', '50개', '15,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '50개', '15,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">50개</span><span class="font-bold">15,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석', '100개', '25,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '100개', '25,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">25,000원</span>
                         </div>
                     </div>
@@ -227,14 +293,17 @@
                     <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-indigo-400"></i> 온전한 호라드림 보석</h4>
                     <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
                     <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 보석', '1개', '7,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '1개', '7,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">1개</span><span class="font-bold">7,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 보석', '5개', '22,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '5개', '22,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">22,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 보석', '10개', '40,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '10개', '40,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">40,000원</span>
+                        </div>
+                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '20개', '75,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">20개</span><span class="font-bold">75,000원</span>
                         </div>
                     </div>
                 </div>
@@ -259,106 +328,62 @@
                     </div>
                 </div>
 
-                <!-- 잊힌 영혼 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-ghost text-purple-500"></i> 잊힌 영혼</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">바닥거래 · 최저가</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '1,000개', '11,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">11,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '3,000개', '25,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">3,000개</span><span class="font-bold">25,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '5,000개', '45,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5,000개</span><span class="font-bold">45,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 벨리알 껍데기 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-drop text-rose-500"></i> 벨리알 껍데기</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">보스 드롭 재료</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '50개', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">50개</span><span class="font-bold">6,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '100개', '10,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">10,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '200개', '19,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">19,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '300개', '26,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">300개</span><span class="font-bold">26,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '500개', '38,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">38,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '1000개', '60,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">60,000원</span>
-                        </div>
-                    </div>
-                </div>
-
                 <!-- 대행서비스 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm md:col-span-2">
                     <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-person-simple-run text-green-500"></i> 대행서비스</h4>
                     <p class="text-[11px] text-blue-500 font-bold mb-4 bg-blue-50 px-2 py-1 rounded inline-block">별도 문의 풀세팅 템문의 다가능</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '1-70레벨', '6,000원')">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (1-70레벨)', '1회', '6,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">1-70레벨</span><span class="font-bold">6,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '정복자 1-100레벨', '25,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">정복자 1-100</span><span class="font-bold">25,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (정복자 1-100레벨)', '1회', '20,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">정복자 1-100</span><span class="font-bold">20,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '만랩 + 정복자1-100', '30,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">만랩+정복자</span><span class="font-bold">30,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (만랩+정복자1-100)', '1회', '25,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">만랩+정복자</span><span class="font-bold">25,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '시즌13 메인퀘 클', '30,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">메인퀘 클</span><span class="font-bold">30,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (시즌13 메인퀘 클리어)', '1회', '30,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">메인퀘 클리어</span><span class="font-bold">30,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '나락100단 1시간', '10,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (나락100단 1시간)', '1시간', '10,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">나락100단 1H</span><span class="font-bold">10,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '고행8 릴리트1회', '5,000원')">
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (고행8 릴리트)', '1회', '5,000원')">
                             <span class="text-[13px] text-slate-600 font-medium">고행8 릴리트</span><span class="font-bold">5,000원</span>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스', '고행10 메피스토 1회', '10,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">고행10 메피스토</span><span class="font-bold">10,000원</span>
+                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (고행10 메피스토)', '1회', '8,000원')">
+                            <span class="text-[13px] text-slate-600 font-medium">고행10 메피스토</span><span class="font-bold">8,000원</span>
                         </div>
                     </div>
                 </div>
 
             </div> <!-- // 그리드 레이아웃 끝 -->
             
-            <!-- 옵두버스 & 하드코어 (별도 문의) -->
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors" onclick="toggleItem(this, '옵두버스 / 극피강철십자가', '별도 상담', '0원')">
-                    <p class="font-bold text-slate-800 text-[14px]">옵두버스 / 극피강철십자가</p>
-                    <span class="text-[11px] font-bold text-blue-500 bg-blue-50 px-2 py-1 rounded">시세 및 제작 문의</span>
+            <!-- 하드코어 (별도 문의) - 하단에 한줄로 깔끔하게 배치 -->
+            <div class="mt-4 bg-red-50 border border-red-100 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div>
+                    <h4 class="font-bold text-red-600 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-warning-circle text-red-500"></i> 하드코어(Hardcore) 전품목</h4>
+                    <p class="text-[11px] text-red-400">하드코어 전용 문의 작성</p>
                 </div>
-                <div class="bg-red-50 border border-red-100 rounded-2xl p-4 shadow-sm flex items-center justify-between cursor-pointer hover:bg-red-100 transition-colors" onclick="toggleItem(this, '하드코어(Hardcore) 전품목', '별도 상담', '0원')">
-                    <p class="font-bold text-red-700 text-[14px]">하드코어 전품목</p>
-                    <span class="text-[11px] font-bold text-red-600 bg-white px-2 py-1 rounded shadow-sm">별도 채팅 문의</span>
+                <div class="price-badge bg-white border-red-200 text-red-600 hover:bg-red-50 w-auto" onclick="toggleItem(this, '[하드코어] 구매 상담', '별도 상담 (품목 기재)', '별도 안내')">
+                    <span class="text-[13px] font-medium mr-2">별도 채팅 문의</span><span class="font-bold">상담 후 결정</span>
                 </div>
             </div>
 
-        </div>
+        </div> <!-- 상품 안내 카드 끝 -->
 
-        <!-- 3. 주문서 작성 카드 -->
+        <!-- 💡 3. 주문서 작성 카드 (상품 안내와 실시간 구매 후기 사이) 💡 -->
         <div id="orderSection" class="bg-white/90 backdrop-blur-xl border border-indigo-200 rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.18)]">
             <div class="flex items-center justify-between mb-2">
                 <label class="flex items-center gap-2 text-xl font-bold text-slate-800">
                     <i class="ph-fill ph-clipboard-text text-indigo-500 text-2xl"></i> 주문서 작성
                 </label>
-                <!-- 초기화 버튼 -->
+                <!-- 추가된 초기화 버튼 -->
                 <button onclick="clearOrder()" class="text-[12px] text-slate-500 hover:text-red-500 flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors">
                     <i class="ph-bold ph-trash"></i> 초기화
                 </button>
             </div>
-            <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">단가표를 누르시면 자동으로 내용이 추가되고 금액이 합산됩니다.</p>
+            <p class="text-[13px] text-slate-500 mb-4 leading-relaxed">단가표를 확인하시고, 원하시는 물품과 수량을 적어 상담을 시작해주세요.</p>
             
             <textarea id="orderText" class="w-full h-[150px] bg-slate-50 text-[14px] text-slate-800 p-5 rounded-2xl border border-slate-300 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition-all duration-300 resize-none outline-none font-mono custom-scrollbar mb-4 font-medium placeholder-slate-400">
 물품정보 및 수량: 
