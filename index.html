@@ -41,13 +41,19 @@
         .animate-blob { animation: blob 7s infinite; }
         .animation-delay-2000 { animation-delay: 2s; }
 
+        @keyframes popupEnter {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-popup { animation: popupEnter 0.2s ease-out forwards; }
+
         /* 💡 카드형 토글 배지 스타일 💡 */
         .price-badge {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
-            background-color: #f8fafc; /* 매우 연한 회색 배경 */
+            background-color: #f8fafc; 
             color: #334155;
             border-radius: 12px;
             cursor: pointer;
@@ -62,7 +68,8 @@
         .price-badge:active {
             transform: translateY(0);
         }
-        /* 선택 시 변경될 스타일은 JS로 클래스를 더해 제어함 */
+        /* 관리자 편집 모드 시 커서 스타일 보정 */
+        .edit-mode-active .price-badge { cursor: text !important; }
     </style>
 
     <!-- 👇 사장님 채널톡 스크립트 👇 -->
@@ -74,7 +81,10 @@
         });
     </script>
 </head>
-<body class="flex flex-col items-center min-h-screen p-4 sm:p-6 relative pt-8">
+<body class="flex flex-col items-center min-h-screen p-4 sm:p-6 relative pt-8 overflow-x-hidden">
+
+    <!-- 💡 우측 상단 비밀 버튼 (투명한 클릭 영역) 💡 -->
+    <div class="fixed top-0 right-0 w-16 h-16 z-[100] cursor-default opacity-0 hover:bg-black/5 transition-colors" title="비밀 버튼" onclick="showAdminAuth()"></div>
 
     <!-- 배경 효과용 고정 컨테이너 -->
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
@@ -82,7 +92,7 @@
         <div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
     </div>
 
-    <!-- 1단 세로 정렬(flex-col) 컨테이너: 모든 요소가 화면 중앙에 차례대로 배치됨 -->
+    <!-- 1단 세로 정렬(flex-col) 컨테이너 -->
     <div class="w-full max-w-4xl mx-auto flex flex-col gap-6 lg:gap-8 items-center relative z-10 mb-28 font-sans">
 
         <!-- 1. 실시간 통계 배너 -->
@@ -123,7 +133,6 @@
                 </div>
             </div>
 
-            <!-- 💡 새로운 카드형 그리드 단가표 영역 💡 -->
             <h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
                 <i class="ph-fill ph-list-dashes text-blue-500"></i> 상품 안내 
                 <span class="text-[11px] font-bold text-indigo-600 ml-1 bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-full animate-pulse shadow-sm flex items-center gap-1">
@@ -131,234 +140,239 @@
                 </span>
             </h3>
 
-            <!-- 2단 그리드 레이아웃 적용 (PC에서 양옆으로 2개씩) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 💡 편집 가능한 영역 래퍼 (이 내부 요소들이 통째로 저장됨) 💡 -->
+            <div id="editablePriceSection" class="transition-all duration-300">
+                
+                <!-- 2단 그리드 레이아웃 적용 -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-                <!-- 지하도시 신화병기공물 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sparkle text-amber-500"></i> 지하도시 신화병기공물</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">신화랜덤1개~6개 랜덤드랍</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '1회', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1회</span><span class="font-bold">6,000원</span>
+                    <!-- 지하도시 신화병기공물 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sparkle text-amber-500"></i> 지하도시 신화병기공물</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">신화랜덤1개~6개 랜덤드랍</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1회</span><span class="font-bold">6,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">5회</span><span class="font-bold">20,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">10회</span><span class="font-bold">36,000원</span>
+                            </div>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '5회', '20,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5회</span><span class="font-bold">20,000원</span>
+                    </div>
+
+                    <!-- 잊힌 영혼 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-ghost text-teal-500"></i> 잊힌 영혼</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">바닥거래</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">7,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">3,000개</span><span class="font-bold">19,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">5,000개</span><span class="font-bold">33,000원</span>
+                            </div>
                         </div>
-                        <div class="price-badge" onclick="toggleItem(this, '지하도시 신화병기공물', '10회', '36,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10회</span><span class="font-bold">36,000원</span>
+                    </div>
+
+                    <!-- 골드 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-coin text-yellow-500"></i> 골드</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">999억 맥스</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">100억</span><span class="font-bold">5,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">200억</span><span class="font-bold">8,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">500억</span><span class="font-bold">17,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">900억</span><span class="font-bold">30,000원</span>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- 상급열쇠 소굴 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key text-slate-500"></i> 상급열쇠 소굴</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1000개</span><span class="font-bold">32,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 하급열쇠 소굴 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key-return text-slate-400"></i> 하급열쇠 소굴</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1000개</span><span class="font-bold">32,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 벨리알 껍데기 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-drop text-rose-500"></i> 벨리알 껍데기</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">보스 드롭 재료</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">8,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">15,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">300개</span><span class="font-bold">24,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">35,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1000개</span><span class="font-bold">50,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 웅장한 보석 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-blue-400"></i> 웅장한 보석</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">5,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">8,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">20개</span><span class="font-bold">15,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">50개</span><span class="font-bold">25,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 온전한 호라드림 보석 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-indigo-400"></i> 온전한 호라드림 보석</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1개</span><span class="font-bold">8,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">35,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">68,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 룬셋 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-squares-four text-slate-700"></i> 룬셋</h4>
+                        <p class="text-[11px] text-slate-400 mb-4">영벌·수의·별반·샤코·한아비·셀리그·티리엘</p>
+                        <div class="space-y-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1셋</span><span class="font-bold">5,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">3셋</span><span class="font-bold">9,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">5셋</span><span class="font-bold">13,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">10셋</span><span class="font-bold">20,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 대행서비스 -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm md:col-span-2">
+                        <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-person-simple-run text-green-500"></i> 대행서비스</h4>
+                        <p class="text-[11px] text-blue-500 font-bold mb-4 bg-blue-50 px-2 py-1 rounded inline-block">별도 문의 풀세팅 템문의 다가능</p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">1-70레벨</span><span class="font-bold">6,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">정복자 1-100</span><span class="font-bold">20,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">만랩+정복자</span><span class="font-bold">25,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">메인퀘 클리어</span><span class="font-bold">30,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">나락100단 1H</span><span class="font-bold">10,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">고행8 릴리트</span><span class="font-bold">5,000원</span>
+                            </div>
+                            <div class="price-badge border-slate-200 bg-[#f8fafc]" onclick="toggleItem(this)">
+                                <span class="text-[13px] text-slate-600 font-medium">고행10 메피스토</span><span class="font-bold">8,000원</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- // 그리드 레이아웃 끝 -->
+                
+                <!-- 하드코어 (별도 문의) - 하단에 한줄로 깔끔하게 배치 -->
+                <div class="mt-4 bg-red-50 border border-red-100 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-bold text-red-600 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-warning-circle text-red-500"></i> 하드코어(Hardcore) 전품목</h4>
+                        <p class="text-[11px] text-red-400">하드코어 전용 문의 작성</p>
+                    </div>
+                    <div class="price-badge bg-white border-red-200 text-red-600 hover:bg-red-50 w-auto" onclick="toggleItem(this)">
+                        <span class="text-[13px] font-medium mr-2">별도 채팅 문의</span><span class="font-bold">상담 후 결정</span>
                     </div>
                 </div>
 
-                <!-- 잊힌 영혼 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-ghost text-teal-500"></i> 잊힌 영혼</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">바닥거래</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '1,000개', '7,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">7,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '3,000개', '19,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">3,000개</span><span class="font-bold">19,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '잊힌 영혼', '5,000개', '33,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5,000개</span><span class="font-bold">33,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 골드 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-coin text-yellow-500"></i> 골드</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">999억 맥스</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '100억', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">100억</span><span class="font-bold">5,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '200억', '8,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200억</span><span class="font-bold">8,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '500억', '17,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500억</span><span class="font-bold">17,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '골드', '900억', '30,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">900억</span><span class="font-bold">30,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 상급열쇠 소굴 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key text-slate-500"></i> 상급열쇠 소굴</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '100개', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '200개', '9,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '500개', '18,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '상급열쇠 소굴', '1000개', '32,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">32,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 하급열쇠 소굴 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-key-return text-slate-400"></i> 하급열쇠 소굴</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">던전 입장권</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '100개', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">6,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '200개', '9,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">9,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '500개', '18,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">18,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '하급열쇠 소굴', '1000개', '32,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">32,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 벨리알 껍데기 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-drop text-rose-500"></i> 벨리알 껍데기</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">보스 드롭 재료</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '100개', '8,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">100개</span><span class="font-bold">8,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '200개', '15,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">200개</span><span class="font-bold">15,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '300개', '24,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">300개</span><span class="font-bold">24,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '500개', '35,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">500개</span><span class="font-bold">35,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '벨리알 껍데기', '1000개', '50,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1,000개</span><span class="font-bold">50,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 웅장한 보석 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-blue-400"></i> 웅장한 보석</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '5개', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">5,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '10개', '8,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">8,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '20개', '15,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">20개</span><span class="font-bold">15,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '웅장한 보석 (섞어서 가능)', '50개', '25,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">50개</span><span class="font-bold">25,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 온전한 호라드림 보석 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-sketch-logo text-indigo-400"></i> 온전한 호라드림 보석</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">루비·에메·토파·해골·사파·다이아·자수</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '1개', '8,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1개</span><span class="font-bold">8,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '5개', '35,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5개</span><span class="font-bold">35,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '온전한 호라드림 (종류 기재)', '10개', '68,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10개</span><span class="font-bold">68,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 룬셋 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-squares-four text-slate-700"></i> 룬셋</h4>
-                    <p class="text-[11px] text-slate-400 mb-4">영벌·수의·별반·샤코·한아비·셀리그·티리엘</p>
-                    <div class="space-y-2">
-                        <div class="price-badge" onclick="toggleItem(this, '룬셋', '1셋', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1셋</span><span class="font-bold">5,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '룬셋', '3셋', '9,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">3셋</span><span class="font-bold">9,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '룬셋', '5셋', '13,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">5셋</span><span class="font-bold">13,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '룬셋', '10셋', '20,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">10셋</span><span class="font-bold">20,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 대행서비스 -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm md:col-span-2">
-                    <h4 class="font-bold text-slate-800 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-person-simple-run text-green-500"></i> 대행서비스</h4>
-                    <p class="text-[11px] text-blue-500 font-bold mb-4 bg-blue-50 px-2 py-1 rounded inline-block">별도 문의 풀세팅 템문의 다가능</p>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (1-70레벨)', '1회', '6,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">1-70레벨</span><span class="font-bold">6,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (정복자 1-100레벨)', '1회', '20,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">정복자 1-100</span><span class="font-bold">20,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (만랩+정복자1-100)', '1회', '25,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">만랩+정복자</span><span class="font-bold">25,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (시즌13 메인퀘 클리어)', '1회', '30,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">메인퀘 클리어</span><span class="font-bold">30,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (나락100단 1시간)', '1시간', '10,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">나락100단 1H</span><span class="font-bold">10,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (고행8 릴리트)', '1회', '5,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">고행8 릴리트</span><span class="font-bold">5,000원</span>
-                        </div>
-                        <div class="price-badge" onclick="toggleItem(this, '대행서비스 (고행10 메피스토)', '1회', '8,000원')">
-                            <span class="text-[13px] text-slate-600 font-medium">고행10 메피스토</span><span class="font-bold">8,000원</span>
-                        </div>
-                    </div>
-                </div>
-
-            </div> <!-- // 그리드 레이아웃 끝 -->
-            
-            <!-- 하드코어 (별도 문의) - 하단에 한줄로 깔끔하게 배치 -->
-            <div class="mt-4 bg-red-50 border border-red-100 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div>
-                    <h4 class="font-bold text-red-600 text-[15px] mb-1 flex items-center gap-1.5"><i class="ph-fill ph-warning-circle text-red-500"></i> 하드코어(Hardcore) 전품목</h4>
-                    <p class="text-[11px] text-red-400">하드코어 전용 문의 작성</p>
-                </div>
-                <div class="price-badge bg-white border-red-200 text-red-600 hover:bg-red-50 w-auto" onclick="toggleItem(this, '[하드코어] 구매 상담', '별도 상담 (품목 기재)', '별도 안내')">
-                    <span class="text-[13px] font-medium mr-2">별도 채팅 문의</span><span class="font-bold">상담 후 결정</span>
-                </div>
-            </div>
+            </div> <!-- // 편집 가능한 영역 끝 -->
 
         </div> <!-- 상품 안내 카드 끝 -->
 
-        <!-- 💡 3. 주문서 작성 카드 (상품 안내와 실시간 구매 후기 사이) 💡 -->
+        <!-- 3. 주문서 작성 카드 -->
         <div id="orderSection" class="bg-white/90 backdrop-blur-xl border border-indigo-200 rounded-3xl p-6 sm:p-8 w-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] transition-all hover:shadow-[0_8px_40px_rgb(0,0,0,0.18)]">
             <div class="flex items-center justify-between mb-2">
                 <label class="flex items-center gap-2 text-xl font-bold text-slate-800">
                     <i class="ph-fill ph-clipboard-text text-indigo-500 text-2xl"></i> 주문서 작성
                 </label>
-                <!-- 추가된 초기화 버튼 -->
+                <!-- 초기화 버튼 -->
                 <button onclick="clearOrder()" class="text-[12px] text-slate-500 hover:text-red-500 flex items-center gap-1 bg-slate-100 hover:bg-red-50 px-2.5 py-1.5 rounded-lg transition-colors">
                     <i class="ph-bold ph-trash"></i> 초기화
                 </button>
@@ -434,22 +448,6 @@
                     </div>
                     <p class="text-[13px] text-slate-600 font-medium leading-relaxed">하드코어라 템 구하기 진짜 빡셌는데 골드와 보석, 극피 세팅까지 완벽하게 맞춰주셨습니다. 덕분에 고행 나락 등반 편하게 하네요.</p>
                 </div>
-
-                <div class="bg-pink-50/50 border border-pink-100 p-4 rounded-2xl hover:bg-white transition-colors shadow-sm">
-                    <div class="flex justify-between items-start mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-pink-100 text-pink-600 flex items-center justify-center font-bold text-sm">Z</div>
-                            <div>
-                                <p class="text-xs font-bold text-slate-700">Zea#3***</p>
-                                <div class="flex text-yellow-400 text-[10px]"><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i><i class="ph-fill ph-star"></i></div>
-                            </div>
-                        </div>
-                        <span class="text-[10px] text-slate-400">1시간 전</span>
-                    </div>
-                    <p class="text-[13px] text-slate-600 font-medium leading-relaxed">
-                        결혼 프사 했다고 벨리알 껍데기 500개나 더 챙겨주셔서 정말 고맙습니다 사장님! 축의금으로 대신 받은 거 같아서 기분이 너무 좋네요.. 인심 너무 좋으셔서 다음에 또 주문하겠습니다 대박나세요!!
-                    </p>
-                </div>
             </div>
             
             <div class="mt-4 pt-4 border-t border-slate-100 text-center">
@@ -477,7 +475,7 @@
         </a>
     </div>
 
-    <!-- 💡 복사 완료 토스트 알림창 (alert 대체) 💡 -->
+    <!-- 💡 복사 완료 토스트 알림창 💡 -->
     <div id="customToast" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[100] bg-slate-900/95 backdrop-blur-xl border border-slate-700 p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center transition-all duration-300 opacity-0 scale-90 pointer-events-none">
         <div class="w-14 h-14 bg-indigo-500 rounded-full flex items-center justify-center mb-4 shadow-lg shadow-indigo-500/30">
             <i class="ph-bold ph-check text-3xl text-white"></i>
@@ -489,151 +487,214 @@
         </p>
     </div>
 
-    <!-- Firebase SDK v11 (Modular) -->
+    <!-- 💡 비밀번호 입력 모달창 (관리자 인증) 💡 -->
+    <div id="adminAuthModal" class="fixed inset-0 bg-black/60 z-[200] hidden items-center justify-center backdrop-blur-sm transition-opacity">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 w-[320px] flex flex-col gap-4 animate-popup">
+            <div class="text-center mb-2">
+                <i class="ph-fill ph-lock-key text-4xl text-amber-500 mb-2"></i>
+                <h3 class="font-bold text-slate-800 text-lg">관리자 모드</h3>
+                <p class="text-xs text-slate-500 mt-1">시세표 편집을 위해 비밀번호를 입력하세요.</p>
+            </div>
+            <input type="password" id="adminPwd" placeholder="비밀번호 입력" class="w-full border border-slate-300 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all text-center tracking-widest" onkeydown="if(event.key==='Enter') verifyAdmin()">
+            <div class="flex gap-2">
+                <button onclick="closeAdminAuth()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold py-3 rounded-xl transition-colors">취소</button>
+                <button onclick="verifyAdmin()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-xl transition-colors shadow-md shadow-amber-500/30">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 💡 관리자용 저장 플로팅 버튼 (수정 모드일 때만 보임) 💡 -->
+    <div id="adminSaveBtn" class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] hidden">
+        <button onclick="saveEditMode()" class="bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-[15px] py-3 px-8 rounded-full shadow-[0_10px_25px_rgba(245,158,11,0.5)] flex items-center gap-2 animate-bounce border-2 border-white">
+            <i class="ph-bold ph-check-circle text-xl"></i> 수정 완료 (저장하기)
+        </button>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, onSnapshot, setDoc, updateDoc, increment, getDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        // 설정 로드
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyC_JQ4NaFn8LrrBY6qYyDnAKoS-ed9g_aA",
+            authDomain: "jinn-c154f.firebaseapp.com",
+            projectId: "jinn-c154f",
+            storageBucket: "jinn-c154f.firebasestorage.app",
+            messagingSenderId: "762418755729",
+            appId: "1:762418755729:web:7197d5e1d214d8f9462730",
+            measurementId: "G-KWQYYF5QFE"
+        };
 
-        // UI 요소
-        const todayViewsEl = document.getElementById('todayViews');
-        const totalViewsEl = document.getElementById('totalViews');
-
-        // 초기화
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const db = getFirestore(app);
 
-        async function initStats() {
-            try {
-                // 1. 인증 처리 (인증 완료까지 기다림)
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+        const todayViewsEl = document.getElementById('todayViews');
+        const totalViewsEl = document.getElementById('totalViews');
+        const todayKey = new Date().toISOString().split('T')[0];
+        const statsDocRef = doc(db, 'gameshop_public_stats', 'global_views_v3');
+
+        onSnapshot(statsDocRef, (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                let todayViews = data.today_views || 0;
+                if (data.last_date !== todayKey) {
+                    todayViews = 0; 
                 }
+                todayViewsEl.innerHTML = todayViews.toLocaleString();
+                totalViewsEl.innerHTML = (data.total_views || 0).toLocaleString();
+            } else {
+                todayViewsEl.innerHTML = "0";
+                totalViewsEl.innerHTML = "0";
+            }
+        });
 
-                onAuthStateChanged(auth, async (user) => {
-                    if (!user) return;
-
-                    const todayKey = new Date().toISOString().split('T')[0];
-                    const statsDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'shop_stats', 'global_views_v2');
-
-                    // 2. 실시간 화면 업데이트
-                    onSnapshot(statsDocRef, (docSnap) => {
-                        if (docSnap.exists()) {
-                            const data = docSnap.data();
-                            todayViewsEl.innerHTML = (data.today_views || 0).toLocaleString();
-                            totalViewsEl.innerHTML = (data.total_views || 0).toLocaleString();
-                        } else {
-                            todayViewsEl.innerHTML = "0";
-                            totalViewsEl.innerHTML = "0";
-                        }
-                    }, (error) => {
-                        console.error("Firestore sync error:", error);
-                    });
-
-                    // 3. 1씩 증가 로직
-                    if (!window.hasCountedView) {
-                        window.hasCountedView = true;
-                        
-                        try {
-                            const sfDoc = await getDoc(statsDocRef);
-                            if (!sfDoc.exists()) {
-                                await setDoc(statsDocRef, { 
-                                    total_views: 1, 
-                                    today_views: 1, 
-                                    last_date: todayKey 
-                                });
-                            } else {
-                                const data = sfDoc.data();
-                                if (data.last_date !== todayKey) {
-                                    await updateDoc(statsDocRef, {
-                                        total_views: increment(1),
-                                        today_views: 1,
-                                        last_date: todayKey
-                                    });
-                                } else {
-                                    await updateDoc(statsDocRef, {
-                                        total_views: increment(1),
-                                        today_views: increment(1)
-                                    });
-                                }
-                            }
-                        } catch (e) {
-                            console.error("Write Error:", e);
-                        }
+        async function incrementView() {
+            try {
+                const sfDoc = await getDoc(statsDocRef);
+                if (!sfDoc.exists()) {
+                    await setDoc(statsDocRef, { total_views: 1, today_views: 1, last_date: todayKey });
+                } else {
+                    const data = sfDoc.data();
+                    if (data.last_date !== todayKey) {
+                        await updateDoc(statsDocRef, { total_views: increment(1), today_views: 1, last_date: todayKey });
+                    } else {
+                        await updateDoc(statsDocRef, { total_views: increment(1), today_views: increment(1) });
                     }
-                });
+                }
+            } catch (e) {
+                console.error("데이터 쓰기 오류:", e);
+            }
+        }
+        incrementView();
+    </script>
 
-            } catch (error) {
-                console.error("Auth/Stats error:", error);
+    <script>
+        // 💡 [관리자 모드 및 자동 저장 기능] 💡
+        let isEditMode = false;
+
+        // 페이지 로드 시 저장된 시세표가 있으면 불러오기
+        document.addEventListener("DOMContentLoaded", () => {
+            const savedPriceTable = localStorage.getItem('savedPriceTable');
+            if (savedPriceTable) {
+                document.getElementById('editablePriceSection').innerHTML = savedPriceTable;
+            }
+        });
+
+        // 비밀번호 창 띄우기
+        function showAdminAuth() {
+            if(isEditMode) return;
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.getElementById('adminPwd').value = '';
+            setTimeout(() => document.getElementById('adminPwd').focus(), 100);
+        }
+
+        // 비밀번호 창 닫기
+        function closeAdminAuth() {
+            const modal = document.getElementById('adminAuthModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        // 비밀번호 확인 로직 (변경 완료)
+        function verifyAdmin() {
+            const pwd = document.getElementById('adminPwd').value;
+            if (pwd === '1575210') { 
+                closeAdminAuth();
+                enableEditMode();
+            } else {
+                alert('비밀번호가 일치하지 않습니다.');
             }
         }
 
-        // 실행
-        initStats();
-    </script>
+        // 편집 모드 활성화
+        function enableEditMode() {
+            isEditMode = true;
+            document.getElementById('adminSaveBtn').classList.remove('hidden');
+            
+            const section = document.getElementById('editablePriceSection');
+            section.classList.add('edit-mode-active', 'ring-4', 'ring-amber-400', 'ring-offset-4', 'rounded-3xl', 'bg-amber-50/20');
+            
+            // 제목, 상품명, 가격 등을 모두 수정 가능하게 변경
+            const editableElements = section.querySelectorAll('span.font-bold, span.font-medium, h4, p');
+            editableElements.forEach(el => {
+                el.contentEditable = true;
+                el.classList.add('outline-dashed', 'outline-1', 'outline-amber-500', 'hover:bg-amber-100');
+            });
 
-    <!-- 커스텀 기능 스크립트 (자동 입력, 토글, 복사 등) -->
-    <script>
-        // 💡 선택된 아이템을 관리하는 Map 객체 (중복 방지 및 토글 기능 지원) 💡
+            // 스크롤 맨 위로 이동
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // 편집 모드 저장 및 종료
+        function saveEditMode() {
+            isEditMode = false;
+            document.getElementById('adminSaveBtn').classList.add('hidden');
+            
+            const section = document.getElementById('editablePriceSection');
+            section.classList.remove('edit-mode-active', 'ring-4', 'ring-amber-400', 'ring-offset-4', 'rounded-3xl', 'bg-amber-50/20');
+            
+            const editableElements = section.querySelectorAll('[contenteditable="true"]');
+            editableElements.forEach(el => {
+                el.contentEditable = false;
+                el.classList.remove('outline-dashed', 'outline-1', 'outline-amber-500', 'hover:bg-amber-100');
+            });
+
+            // 💡 현재 상태의 HTML을 브라우저에 영구 저장 💡
+            localStorage.setItem('savedPriceTable', section.innerHTML);
+            
+            alert('✅ 시세표가 성공적으로 저장되었습니다!\n앞으로 이 브라우저에서는 수정한 시세로 보여집니다.');
+        }
+
+
+        // 💡 [주문서 담기 및 토글 기능] 💡
         let selectedItemsMap = new Map();
         let totalAmount = 0;
 
-        // 💡 가격 버튼 클릭 시 토글(선택/해제) 및 주문서 업데이트 기능 💡
-        function toggleItem(btnElement, category, optionName, priceValueStr) {
-            // "6,000원" 같은 문자열에서 숫자만 추출
-            const priceNum = parseInt(priceValueStr.replace(/,/g, '').replace('원', ''), 10) || 0;
+        function toggleItem(btnElement) {
+            if (isEditMode) return; // 편집 모드일 때는 체크(토글) 방지
+            
+            const spans = btnElement.querySelectorAll('span');
+            if (!spans || spans.length < 2) return;
+            
+            // 화면에 적힌 글자를 실시간으로 읽어옴 (수정된 가격도 바로 반영됨)
+            const optionName = spans[0].innerText.trim();
+            const priceValueStr = spans[1].innerText.trim();
+            
+            // 가격에서 숫자만 추출하여 합산용 데이터 생성
+            const priceNum = parseInt(priceValueStr.replace(/[^0-9]/g, ''), 10) || 0;
+            
+            // 카테고리명은 부모 컨테이너(카드)의 제목(h4)에서 추출
+            const cardHeader = btnElement.closest('.shadow-sm').querySelector('h4');
+            const category = cardHeader ? cardHeader.innerText.trim() : '기타 상품';
+
             const uniqueKey = category + '_' + optionName;
             
-            // 이미 선택된 박스인지 확인
             const isSelected = btnElement.classList.contains('border-indigo-500');
             
             if (isSelected) {
-                // 선택 해제 (디자인 원래대로)
+                // 선택 해제
                 btnElement.classList.remove('border-indigo-500', 'bg-indigo-50', 'ring-1', 'ring-indigo-500');
-                btnElement.classList.add('border-slate-200', 'bg-white'); 
-                
-                // 내부 텍스트 색상 복구
-                const spans = btnElement.querySelectorAll('span');
-                if(spans.length >= 2) {
-                    spans[0].classList.replace('text-indigo-600', 'text-slate-600');
-                    spans[1].classList.replace('text-indigo-900', 'text-slate-800');
-                }
+                btnElement.classList.add('border-slate-200', 'bg-[#f8fafc]'); 
                 
                 selectedItemsMap.delete(uniqueKey);
                 totalAmount -= priceNum;
             } else {
-                // 선택 추가 (테두리 및 배경색 파랗게)
+                // 선택 추가
                 btnElement.classList.add('border-indigo-500', 'bg-indigo-50', 'ring-1', 'ring-indigo-500');
-                btnElement.classList.remove('border-slate-200', 'bg-white');
-                
-                // 내부 텍스트 색상 파랗게 변경
-                const spans = btnElement.querySelectorAll('span');
-                if(spans.length >= 2) {
-                    spans[0].classList.replace('text-slate-600', 'text-indigo-600');
-                    spans[1].classList.replace('text-slate-800', 'text-indigo-900');
-                }
+                btnElement.classList.remove('border-slate-200', 'bg-[#f8fafc]');
                 
                 selectedItemsMap.set(uniqueKey, { category, optionName, priceValueStr, priceNum });
                 totalAmount += priceNum;
             }
             
-            // 주문서 텍스트 즉시 업데이트
             updateOrderText();
         }
 
-        // 💡 주문서 텍스트 렌더링 함수 💡
         function updateOrderText() {
             const textarea = document.getElementById('orderText');
             let currentText = textarea.value;
             
-            // 기존에 입력된 구매자 정보 유지
             let buyerInfoPart = "[구매자 정보]\n배틀태그: \n입금자명: ";
             const splitIndex = currentText.indexOf("[구매자 정보]");
             if (splitIndex !== -1) {
@@ -642,7 +703,7 @@
             
             let itemsText = [];
             selectedItemsMap.forEach((val) => {
-                itemsText.push(`- ${val.category} ${val.optionName} / ${val.priceValueStr}`);
+                itemsText.push(`- ${val.category} / ${val.optionName} (${val.priceValueStr})`);
             });
             
             let totalText = "";
@@ -661,11 +722,9 @@
                  textarea.value = `물품정보 및 수량:\n${itemsText.join('\n')}${totalText}\n\n\n${buyerInfoPart}`;
             }
             
-            // 주문서 영역으로 부드럽게 스크롤 이동
             const orderSection = document.getElementById('orderSection');
             orderSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
             
-            // 시각적 강조 효과 (파란색 깜빡임)
             textarea.classList.remove('border-slate-300');
             textarea.classList.add('border-indigo-600', 'ring-4', 'ring-indigo-500/30', 'bg-indigo-50');
             setTimeout(() => {
@@ -674,18 +733,10 @@
             }, 800);
         }
 
-        // 주문서 및 선택된 모든 버튼 초기화
         function clearOrder() {
-            // 시각적으로 켜진 모든 버튼 끄기
             document.querySelectorAll('.price-badge.border-indigo-500').forEach(btn => {
                 btn.classList.remove('border-indigo-500', 'bg-indigo-50', 'ring-1', 'ring-indigo-500');
-                btn.classList.add('border-slate-200', 'bg-white');
-                
-                const spans = btn.querySelectorAll('span');
-                if(spans.length >= 2) {
-                    spans[0].classList.replace('text-indigo-600', 'text-slate-600');
-                    spans[1].classList.replace('text-indigo-900', 'text-slate-800');
-                }
+                btn.classList.add('border-slate-200', 'bg-[#f8fafc]');
             });
             
             selectedItemsMap.clear();
@@ -693,18 +744,33 @@
             updateOrderText();
         }
 
-        // 상담중 인원 로직 (1~6명 사이, 로드 시 즉시 1번 실행 후 천천히 변동)
-        function updateActiveChats() {
+        function initActiveChats() {
             const activeChatsEl = document.getElementById('activeChats');
-            if(activeChatsEl) {
-                activeChatsEl.innerHTML = Math.floor(Math.random() * 6) + 1;
+            if(!activeChatsEl) return;
+            function refreshCount() {
+                const newCount = Math.floor(Math.random() * 6) + 1;
+                localStorage.setItem('activeChatCount', newCount);
+                localStorage.setItem('lastChatUpdateTime', Date.now());
+                activeChatsEl.innerHTML = newCount;
+            }
+            const now = Date.now();
+            const savedTime = localStorage.getItem('lastChatUpdateTime');
+            let savedCount = localStorage.getItem('activeChatCount');
+
+            if (!savedTime || !savedCount || (now - parseInt(savedTime)) > 20000) {
+                refreshCount();
+                setInterval(refreshCount, 20000);
+            } else {
+                activeChatsEl.innerHTML = savedCount;
+                const timeRemaining = 20000 - (now - parseInt(savedTime));
+                setTimeout(() => {
+                    refreshCount();
+                    setInterval(refreshCount, 20000);
+                }, timeRemaining);
             }
         }
-        
-        updateActiveChats();
-        setInterval(updateActiveChats, 10000 + Math.random() * 5000);
+        initActiveChats();
 
-        // 주문서 복사하고 채널톡 열기 (토스트 팝업 적용)
         function processOrder() {
             const textarea = document.getElementById('orderText');
             textarea.select();
@@ -728,8 +794,6 @@
             
             if (typeof ChannelIO !== 'undefined') {
                 ChannelIO('showMessenger');
-            } else {
-                console.error('채널톡 로드 지연');
             }
         }
     </script>
